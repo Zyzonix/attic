@@ -27,8 +27,8 @@ import urllib.request
 import wget
 
 # static config
-configFile = "sync-github.ini"
-# configFile = "/root/repo-sync-external/sync-github.ini"
+# configFile = "sync-github.ini"
+configFile = "/root/repo-sync-external/sync-github.ini"
 configFileGeneral = "GENERAL"
 
 
