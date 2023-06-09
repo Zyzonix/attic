@@ -252,10 +252,13 @@ class core():
             localCurrentRelease = self.getCurrentReleaseFromFile(repository)
             
             # if local and remote version are equal -> lookup next
-            # add not to next line
-            if not localCurrentRelease == lastestRelease: 
-                logging.write(self, "Update available for " + repository)
-                self.downloadHandler(repository, lastestRelease, localCurrentRelease)
+            if not localCurrentRelease == lastestRelease:
+                # filter for alpha/beta releases
+                if not ("beta" or "alpha") in lastestRelease: 
+                    logging.write(self, "Update available for " + repository)
+                    self.downloadHandler(repository, lastestRelease, localCurrentRelease)
+                else:
+                    logging.write(self, repository + "'s latest release contains alpha/beta - skipping")
             else:
                 logging.write(self, "Local version is the newest - skipping " + repository)
                 
