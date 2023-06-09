@@ -1,0 +1,9 @@
+[Unit]
+Description=Enable Gigabit
+
+[Service]
+Type=oneshot
+ExecStart = /sbin/ethtool -s <interface HERE> speed 1000 duplex full autoneg off
+
+[Install]
+WantedBy=basic.target
