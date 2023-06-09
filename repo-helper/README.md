@@ -39,6 +39,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # *  *  *  *  * user-name command to be executed
 5 0  *  *  *  * root /usr/bin/python3 /root/repo-helper/sync-repo-from-github.py
 ```
+Remember to add the correct path to your config file in line 29/30, otherwise the autorun cannot run correctly...
+
 
 Edit the config file to add repositories:
 
