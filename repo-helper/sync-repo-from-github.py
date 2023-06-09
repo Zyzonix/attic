@@ -27,7 +27,7 @@ import shutil
 
 # static config
 configFile = "sync-repo-from-github.ini"
-# configFile = "/root/repo-helper/sync-repo-from-github.py"
+# configFile = "/root/repo-helper/sync-repo-from-github.ini"
 configFileGeneral = "GENERAL"
 
 
