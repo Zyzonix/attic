@@ -1,0 +1,17 @@
+[Unit]
+Description=Chia Crypto Controller
+Wants=network-online.target
+After=network.target network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=forking
+Restart=always
+RestartSec=1
+User=chia
+Environment=PATH=/home/chia/chia-blockchain/venv/bin:${PATH}
+ExecStart=/usr/bin/env chia start farmer -r
+ExecStop=/usr/bin/env chia stop all -d
+
+[Install]
+WantedBy=multi-user.target
