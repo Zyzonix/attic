@@ -25,6 +25,7 @@ import traceback
 import subprocess
 import urllib.request
 import wget
+import shutil
 
 # static config
 # configFile = "sync-github.ini"
@@ -136,7 +137,7 @@ class core():
         if filesToMove: logging.write(self, "Moving downloaded files to final repository directory (" + self.finalDebDir + ")")
         try: 
             for file in filesToMove:
-                os.rename(self.downloads + file, self.finalDebDir + file)
+                shutil.move(self.downloads + file, self.finalDebDir + file)
         except:
             logging.writeError(self, "Failed to move all downloads to repository's directory")
             logging.writeExecError(self, traceback.format_exc())
