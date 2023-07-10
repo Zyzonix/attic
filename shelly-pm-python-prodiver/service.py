@@ -36,7 +36,7 @@ def retrieveData(url):
         data = requests.get(url)
         return data
     except:
-        traceback.format_exec()
+        print(traceback.format_exec())
         return False
 
 def selectData(data):
