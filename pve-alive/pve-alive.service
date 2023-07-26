@@ -1,0 +1,12 @@
+[Unit]
+Description=Run PVE-Alive
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /root/pve-alive/pve-alive.py
+Type=simple
+Restart=always
+
+[Install]
+WantedBy=default.target
+RequiredBy=network.target
