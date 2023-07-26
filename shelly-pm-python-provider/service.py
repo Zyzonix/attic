@@ -7,8 +7,8 @@
 #
 # date created  | 10-07-2023 13:28:13
 # 
-# file          | solar-data-provider/service.py
-# project       | root
+# file          | shelly-pm-python-provider/service.py
+# project       | shelly-pm-python-provider
 # file version  | 1.0.0
 #
 from fastapi import FastAPI
@@ -48,7 +48,7 @@ def selectData(data):
     return finalData
 
 def dataImportHandler():
-    url = "http://shelly.dtzmlink.de/status"
+    url = "http://<hostname-or-ip-of-shelly-plug>/status"
     webData = retrieveData(url)
     selectedData = {}
     answer = []
@@ -93,5 +93,5 @@ class Core():
 # initialize script
 if __name__ == "__main__":
     print("starting data provider")
-    #dataImportHandler()
+
     Core.serverInit()
