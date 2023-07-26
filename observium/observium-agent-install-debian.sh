@@ -7,9 +7,9 @@
 #
 # date created  | 23-05-2023 07:09:26
 # 
-# file          | observium-agent-install-debian.sh
-# project       | observium-agent-install
-# file version  | 0.0.1
+# file          | observium-agent-quick-install.sh
+# project       | observium-scripts
+# file version  | 0.0.2
 #
 
 echo "#################################################################"
@@ -36,58 +36,93 @@ read -p "Press any key to continue the installation or CTRL+C to exit..." CONFIR
 echo ""
 
 # static vars
-XINETDRESTART="/usr/bin/systemctl restart xinetd.service"
 OBSERVIUMPATH=/opt/observium
 OBSERVIUMIP="0.0.0.0"
 OBSERVIUMPORT=22
 OBSERVIUMUSER=root
 OBSERVIUMROOTPW=
-APTGETPATH=/usr/bin/apt-get
 SCPPATH=/usr/bin/scp
 SSHPASSPATH=/usr/bin/sshpass
 SSHKEYGENPATH=/usr/bin/ssh-keygen
 AGENTDIR=/usr/lib/observium_agent
 
-echo ""
-echo "Updating and installing xinetd and sshpass"
-echo ""
-$APTGETPATH update 
-$APTGETPATH install xinetd sshpass -y
+ID=XXX
+echo "Currently supported and tested distributions are Debian/Ubuntu and ArtixLinux."
+echo "Getting OS..."
+sleep 2
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    ID=$ID
 
-# ask for observiums IP/hostname
-echo ""
-read -p "Please enter either the IP or the hostname of your observium installation: " OBSERVIUMIP
+    if [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ]; then
+      XINETDENABLE="/usr/bin/systemctl enable xinetd.service"
+      XINETDRESTART="/usr/bin/systemctl restart xinetd.service"
+      UPDATEGETPATH=/usr/bin/apt-get
 
-# check SSH port
-read -p "Please enter the SSH port of your observium installation (default: 22): " SSHPORT
-OBSERVIUMPORT=$SSHPORT
+      echo ""
+      echo "Updating and installing xinetd and sshpass"
+      echo ""
+      $UPDATEGETPATH update 
+      $UPDATEGETPATH install xinetd sshpass -y
 
-# ask for observiums root pw
-echo -n "Please enter the password for root@"$OBSERVIUMIP": " 
-read -s OBSERVIUMROOTPW
+    elif [ "$ID" = "artix" ]; then
+      XINETDENABLE="/usr/bin/rc-update add xinetd"
+      XINETDRESTART="/usr/bin/rc-service xinetd restart"
+      UPDATEGETPATH="/usr/bin/pacman"
 
-echo ""
-echo "Copying xinetd script from observium"
-$SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/observium_agent_xinetd /etc/xinetd.d/observium_agent_xinetd
+      echo ""
+      echo "Updating and installing xinetd and sshpass"
+      echo ""
+      $UPDATEGETPATH update 
+      $UPDATEGETPATH -S xinetd-openrc sshpass  --noconfirm
 
-echo ""
-echo "Restarting xinetd"
-$XINETDRESTART
+    fi
 
-echo ""
-echo "Copying observium agent from observium"
-$SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/observium_agent /usr/bin/observium_agent
+    # ask for observiums IP/hostname
+    echo ""
+    read -p "Please enter either the IP or the hostname of your observium installation: " OBSERVIUMIP
 
-echo ""
-echo "Creating required directories and copying all scripts"
-mkdir -p $AGENTDIR
-mkdir -p $AGENTDIR/scripts-available
-mkdir -p $AGENTDIR/scripts-enabled
-$SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/agent-local/* /usr/lib/observium_agent/scripts-available
+    # check SSH port
+    read -p "Please enter the SSH port of your observium installation (default: 22): " SSHPORT
+    OBSERVIUMPORT=$SSHPORT
 
-echo ""
-echo "Now you can link the scripts to '"$AGENTDIR/scripts-enabled"' as example via "
-echo "'sudo ln -s /usr/lib/observium_agent/scripts-available/os /usr/lib/observium_agent/scripts-enabled'"
-echo ""
-echo "If using ufw or another firewall remind of allowing the port 36602 (observium agent)!"
-echo ""
+    # ask for observiums root pw
+    echo -n "Please enter the password for root@"$OBSERVIUMIP": " 
+    read -s OBSERVIUMROOTPW
+
+    echo ""
+    echo "Copying xinetd script from observium"
+    $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/observium_agent_xinetd /etc/xinetd.d/observium_agent_xinetd
+
+    echo ""
+    echo "Enabling and restarting xinetd"
+    $XINETDENABLE
+    $XINETDRESTART
+
+    echo ""
+    echo "Copying observium agent from observium"
+    $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/observium_agent /usr/bin/observium_agent
+
+    echo ""
+    echo "Creating required directories and copying all scripts"
+    mkdir -p $AGENTDIR
+    mkdir -p $AGENTDIR/scripts-available
+    mkdir -p $AGENTDIR/scripts-enabled
+    $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/agent-local/* /usr/lib/observium_agent/scripts-available
+
+    echo ""
+    echo "You can now link the scripts to '"$AGENTDIR/scripts-enabled"' as example via "
+    echo "'sudo ln -s /usr/lib/observium_agent/scripts-available/os /usr/lib/observium_agent/scripts-enabled'"
+    echo ""
+    echo "If using ufw or another firewall remind of allowing the port 36602 (observium agent)!"
+    echo ""
+
+fi
+
+if [ $ID == "XXX" ]; then
+    echo ""
+    echo "Was not able to detect your system - exiting...."
+    echo ""
+    exit 1
+fi
+exit 0
