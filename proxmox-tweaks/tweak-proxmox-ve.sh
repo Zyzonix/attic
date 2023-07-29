@@ -9,42 +9,52 @@
 # 
 # file          | tweak-proxmox-ve.sh
 # project       | proxmox-tweaks
-# file version  | 0.0.1
+# file version  | 0.0.2
 #
-# GitHub: https://github.com/Zyzonix/storage/proxmox-tweaks/tweak-proxmox-ve.sh
+# GitHub: https://github.com/Zyzonix/attic/proxmox-tweaks/tweak-proxmox-ve.sh
 #
 
 #############################################################
 # This script is designed for Proxmox Virtual Environment!! #
 #############################################################
 #
-# tested against Proxmox VE 7.4-3
+# tested against Proxmox VE 
+# - 7.4-16
 #
+
 # Installation:
 # $ mkdir /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/
-# $ wget https://raw.githubusercontent.com/Zyzonix/storage/main/proxmox-tweaks/tweak-proxmox-ve.sh
+# $ wget https://raw.githubusercontent.com/Zyzonix/attic/main/proxmox-tweaks/tweak-proxmox-ve.sh
 # then install a crontab under /etc/crontab to be run once a day: 
-# # Auto tweak proxmox after each upgrade (https://github.com/Zyzonix/storage/proxmox-tweaks)
+# # Auto tweak proxmox after each upgrade (https://github.com/Zyzonix/attic/proxmox-tweaks)
 # 1  0    * * *   root    /bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-ve.sh
 #
 
-# create backup of old js-file
-cp /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js.bak
+
+PROXMOXLIBJS=/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
 
 # keystring1 (old config) -> delete line
-SEARCH1="if (res === null || res === undefined || !res || res"
+SEARCH1='if (res === null || res === undefined || !res || res'
 
 # keystring2 (old config)
 SEARCH2=".data.status.toLowerCase() !== 'active') {"
 # new keystring2
 REPLACE1="if (false) {"
 
+# check if file was updated (true if contains SEARCH1)
+if grep -q "$SEARCH1" "$PROXMOXLIBJS"; then
 
-# replace first line
-sed -i "s/$SEARCH1/$REPLACE1/g" /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+    echo "found"
+    # create backup of old js-file
+    cp $PROXMOXLIBJS $PROXMOXLIBJS.bak
 
-# delete second line
-sed -i "/$SEARCH2/d" /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+    # replace first line
+    sed -i "s/$SEARCH1/$REPLACE1/g" $PROXMOXLIBJS
 
-# restart proxmox proxy
-systemctl restart pveproxy.service
+    # delete second line
+    sed -i "/$SEARCH2/d" $PROXMOXLIBJS
+
+    # restart proxmox proxy
+    systemctl restart pveproxy.service
+
+fi

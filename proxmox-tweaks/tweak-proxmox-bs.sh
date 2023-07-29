@@ -9,9 +9,9 @@
 # 
 # file          | tweak-proxmox-bs.sh
 # project       | proxmox-tweaks
-# file version  | 0.0.1
+# file version  | 0.0.2
 #
-# GitHub: https://github.com/Zyzonix/storage/proxmox-tweaks/tweak-proxmox-bs.sh
+# GitHub: https://github.com/Zyzonix/attic/proxmox-tweaks/tweak-proxmox-bs.sh
 #
 
 #######################################################
@@ -27,9 +27,9 @@
 
 # Installation:
 # $ mkdir /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/
-# $ wget https://raw.githubusercontent.com/Zyzonix/storage/main/proxmox-tweaks/tweak-proxmox-bs.sh
+# $ wget https://raw.githubusercontent.com/Zyzonix/attic/main/proxmox-tweaks/tweak-proxmox-bs.sh
 # then install a crontab under /etc/crontab to be run once a day: 
-# # Auto tweak proxmox after each upgrade (https://github.com/Zyzonix/storage/proxmox-tweaks)
+# # Auto tweak proxmox after each upgrade (https://github.com/Zyzonix/attic/proxmox-tweaks)
 # 1  0    * * *   root    /bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-bs.sh
 
 
@@ -43,6 +43,7 @@ SEARCH2=".data.status.toLowerCase() !== 'active') {"
 # new keystring2
 REPLACE1="if (false) {"
 
+# check if file was updated (true if contains SEARCH1)
 if grep -q "$SEARCH1" "$PROXMOXLIBJS"; then
 
     echo "found"
