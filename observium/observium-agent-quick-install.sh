@@ -76,6 +76,12 @@ if [ -f /etc/os-release ]; then
       $UPDATEGETPATH update 
       $UPDATEGETPATH -S xinetd-openrc sshpass  --noconfirm
 
+    else
+      echo ""
+      echo "Was not able to detect your system - exiting...."
+      echo ""
+      exit 1
+
     fi
 
     # ask for observiums IP/hostname
@@ -120,9 +126,6 @@ if [ -f /etc/os-release ]; then
 fi
 
 if [ $ID == "XXX" ]; then
-    echo ""
-    echo "Was not able to detect your system - exiting...."
-    echo ""
-    exit 1
+
 fi
 exit 0
