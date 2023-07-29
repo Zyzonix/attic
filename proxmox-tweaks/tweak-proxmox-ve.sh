@@ -44,7 +44,8 @@ REPLACE1="if (false) {"
 # check if file was updated (true if contains SEARCH1)
 if grep -q "$SEARCH1" "$PROXMOXLIBJS"; then
 
-    echo "found"
+    echo "ProxmoxVE seems to got an update"
+    echo "tweak-proxmox-ve found lines to remove. Removing..."
     # create backup of old js-file
     cp $PROXMOXLIBJS $PROXMOXLIBJS.bak
 
@@ -56,5 +57,6 @@ if grep -q "$SEARCH1" "$PROXMOXLIBJS"; then
 
     # restart proxmox proxy
     systemctl restart pveproxy.service
-
+    
+    echo "Restarted proxy"
 fi
