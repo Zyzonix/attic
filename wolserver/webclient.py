@@ -159,14 +159,14 @@ class server():
         table, th, ts { 
             border: none; 
             text-align: left; 
-            min-width: 20%;
+            min-width: 40%;
         }
         tr:nth-child(even) {
             background-color: #e0e0eb;
         }
         </style>
         <body>
-        <h1>''' + hostInformation.fullHostname + ''' / Registered servers:</h1><p>Please click on the hostname of the server you want to wakeup.</p>'''
+        <h1>''' + hostInformation.fullHostname + ''' / Wake-on-LAN Server<h1><h3>Registered servers:</h3><p>Please click on the hostname of the server you want to wakeup.</p>'''
         resp += "<hr>"
         hosts = config.getServersFomFile()
         if hosts:
@@ -185,7 +185,7 @@ class server():
                 if hosts[host]["ip"]: ip = hosts[host]["ip"]
                 resp += "<td>" + str(ip) +"</td>"
                 autowakeup = "unknown"
-                if hosts[host]["autowakeup"] != "": ip = hosts[host]["autowakeup"]
+                if hosts[host]["autowakeup"] != "": autowakeup = hosts[host]["autowakeup"]
                 resp += "<td>" + str(autowakeup) +"</td>"
                 resp += "</tr>"
             resp += "</table>" 
