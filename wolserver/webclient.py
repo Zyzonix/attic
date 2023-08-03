@@ -220,13 +220,13 @@ class server():
                 else:
                     logging.write(result)
                     resp += "Tried waking up " + host + " [" + mac + "]"            
-                    resp += "<br>Return to: <a href='https://" + hostInformation.fullHostname + "/'>" + hostInformation.fullHostname + "</a>"
+                    resp += "<br>Return to: <a href='https://" + hostInformation.fullHostname + ":80/'>" + hostInformation.fullHostname + "</a>"
             except:
                 resp += "Failed to wake up " + host
-                resp += "<br>Return to: <a href='https://" + hostInformation.fullHostname + "/'>" + hostInformation.fullHostname + "</a>"
+                resp += "<br>Return to: <a href='https://" + hostInformation.fullHostname + ":80/'>" + hostInformation.fullHostname + "</a>"
         else:
             resp += "Was not able to read config file under " + SERVERSPATH
-            resp += "<br>Return to: <a href='https://" + hostInformation.fullHostname + "/'>" + hostInformation.fullHostname + "</a>"
+            resp += "<br>Return to: <a href='https://" + hostInformation.fullHostname + ":80/'>" + hostInformation.fullHostname + "</a>"
         return resp  
 
     # we do not want to use this here
