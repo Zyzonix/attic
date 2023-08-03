@@ -98,7 +98,7 @@ The following values are hardcoded at the beginning of the main python file:
 **General configuration:**
 Key | Setting
 ---|---
-```SERVERIP``` | Defines the IP of the server (default is loopback), change this, otherwise you won't be able to access the webserer via HTTP.
+```SERVERIP``` | Defines the IP of the server [e.g. ```10.0.100.2```] (default is loopback), change this, otherwise you won't be able to access the webserer via HTTP.
 ```BASEDIR``` | Directory where the main python file is
 ```SERVERSPATH``` | Path to ```servers.ini```, main config file for hosts to wakeup
 ```LOGFILEDIR``` | Directory where the log file should be saved to (Remind to create this directory!)
