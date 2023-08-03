@@ -98,14 +98,14 @@ class hostInformation():
             result = resultEncoded.stdout.decode()[:-1]
             resultErr = resultEncoded.stderr.decode()[:-1]
             if resultErr:
-                logging.writeError("Failed to get DNS suffix (command exited with error)")
+                logging.writeError(self, "Failed to get DNS suffix (command exited with error)")
             else:
                 # in case of 'hostname hostname' --> only one time hostname
                 if str(platform.node() + " ") in result:
-                    logging.write("Correcting retrieved hostname from " + result + " to " + platform.node())
+                    logging.write(self, "Correcting retrieved hostname from " + result + " to " + platform.node())
                     hostInformation.fullHostname = platform.node()
                 else: hostInformation.fullHostname = result
-                logging.write("Got full hostname successfully: " + hostInformation.fullHostname)    
+                logging.write(self, "Got full hostname successfully: " + hostInformation.fullHostname)    
                 if hostInformation.fullHostname[len(hostInformation.fullHostname) - 1] == " ":
                     hostInformation.fullHostname = hostInformation.fullHostname[:-1]           
         except:
