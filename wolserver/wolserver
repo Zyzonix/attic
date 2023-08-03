@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# written by ZyzonixDev
+# published by ZyzonixDevelopments
+#
+# Copyright (c) 2023 ZyzonixDevelopments
+#
+# date created  | 28-07-2023 10:13:41
+# 
+# file          | wolserver (main executeable)
+# project       | wolserver
+# file version  | 1.0
+#
+
+PYTHON=/usr/bin/python3
+BASEDIR=/home/dietzmpe/dev/attic/wolserver
+#BASEDIR=/opt/wolserver
+
+# arguments after command
+KEY=$@
+
+# check if executed as root
+USR=$(/usr/bin/id -u)
+if [ $USR -ne 0 ]
+  then echo "Please rerun this script as root (su -i or sudo)- exiting..."
+  exit
+fi
+
+if [[ "$KEY" == "server" ]]; then
+    echo "INFO  | Recognized 'server' key - starting webserver script"
+    $PYTHON $BASEDIR/webclient.py
+
+elif [[ "$KEY" == *"wakeup"* ]]; then
+    echo "INFO  | Recognized 'wakeup' key - starting application"
+    $PYTHON $BASEDIR/wakeup.py $KEY
+
+else
+    echo "ERROR | Key not recognized"
+    echo "ERROR | Key was: " "$KEY"
+    echo "ERROR | Allowed keys are: 'server' or 'wakeup [host]'"
+fi
