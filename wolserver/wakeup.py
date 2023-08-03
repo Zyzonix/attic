@@ -21,8 +21,7 @@ import platform
 
 # base directory
 # PATHS must end with '/'!
-#BASEDIR = "/opt/wolserver/"
-BASEDIR = "/home/dietzmpe/dev/attic/wolserver/"
+BASEDIR = "/opt/wolserver/"
 SERVERSPATH = BASEDIR + "servers.ini"
 LOGFILEDIR = "/var/log/wolserver/wakeup/"
 WAKEUPINTERVAL = 1

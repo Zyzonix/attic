@@ -25,8 +25,7 @@ import subprocess
 
 # base directory
 # PATHS must end with '/'!
-#BASEDIR = "/opt/wolserver/"
-BASEDIR = "/home/dietzmpe/dev/attic/wolserver/"
+BASEDIR = "/opt/wolserver/"
 SERVERSPATH = BASEDIR + "servers.ini"
 LOGFILEDIR = "/var/log/wolserver/webclient/"
 
@@ -188,7 +187,7 @@ class server():
         resp += "<br>"
         resp += "To add additional server edit '" + SERVERSPATH + "' manually."
         resp += "<hr>"
-        resp += "<br>Wolserver v1.0 from: <a href='http://github.com/Zyzonix/attic/wolserver/'>github.com/Zyzonix/attic/wolserver/</a></body></html>"
+        resp += "<br>Wolserver v1.0 from: <a href='https://github.com/Zyzonix/attic/tree/main/wolserver'>github.com/Zyzonix/attic/tree/main/wolserver/</a></body></html>"
         return resp
 
     # wakeup link
