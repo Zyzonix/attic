@@ -185,7 +185,7 @@ class server():
                 if hosts[host]["ip"]: ip = hosts[host]["ip"]
                 resp += "<td>" + str(ip) +"</td>"
                 autowakeup = "unknown"
-                if not hosts[host]["autowakeup"] is "": ip = hosts[host]["autowakeup"]
+                if hosts[host]["autowakeup"] != "": ip = hosts[host]["autowakeup"]
                 resp += "<td>" + str(autowakeup) +"</td>"
                 resp += "</tr>"
             resp += "</table>" 
