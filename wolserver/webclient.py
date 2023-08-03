@@ -127,11 +127,12 @@ class config():
 
         try:
             serversImpHandler.read(SERVERSPATH)
+            logging.write("Found servers.ini file. Hosts in file: " + str(serversImpHandler.sections()))
             for host in serversImpHandler.sections():
                 serverMAC = serversImpHandler[host]["mac"]
                 serverAutowakeup = serversImpHandler.getboolean(host, "autowakeup")
                 hostIP = serversImpHandler[host]["ip"]
-                if serverMAC and serverAutowakeup:
+                if serverMAC:
                     hosts[host] = {}
                     hosts[host]["mac"] = serverMAC
                     hosts[host]["autowakeup"] = serverAutowakeup
@@ -140,7 +141,7 @@ class config():
             logging.writeError("Cannot load servers config file!")
             logging.writeExecError(traceback.format_exc())
             return False
-        
+        logging.write("Got hosts: " + str(hosts))
         return hosts
 
 # web register points
@@ -174,6 +175,7 @@ class server():
             resp += "<th>Hostname</th>"
             resp += "<th>MAC</th>"
             resp += "<th>IP (if provided)</th>"
+            resp += "<th>Autowakeup enabled</th>"
             resp += "</tr>"
             for host in hosts:
                 resp += "<tr>"
@@ -182,15 +184,18 @@ class server():
                 ip = "unknown"
                 if hosts[host]["ip"]: ip = hosts[host]["ip"]
                 resp += "<td>" + str(ip) +"</td>"
+                autowakeup = "unknown"
+                if not hosts[host]["autowakeup"] is "": ip = hosts[host]["autowakeup"]
+                resp += "<td>" + str(autowakeup) +"</td>"
                 resp += "</tr>"
             resp += "</table>" 
             logging.write("Retrieved table successfully-")
         else:
-            resp += "<p>Was not able to read config file under " + SERVERSPATH + "</p>"
-            logging.writeError("Failed to read config file under " + SERVERSPATH)
+            resp += "<p>Config file seems to be empty, edit under:  " + SERVERSPATH + "</p>"
+            logging.writeError("Config file seems to be empty, edit under: " + SERVERSPATH)
 
         resp += "<br>"
-        resp += "To add additional server edit '" + SERVERSPATH + "' manually."
+        resp += "For changing autowakeup or adding additional servers edit '" + SERVERSPATH + "' manually."
         resp += "<hr>"
         resp += "<br>Wolserver v1.0 from: <a href='https://github.com/Zyzonix/attic/tree/main/wolserver'>github.com/Zyzonix/attic/tree/main/wolserver/</a></body></html>"
         return resp
