@@ -12,15 +12,18 @@ Additionally this scripts can only be executed on Linux!
 ## Installation
 Install to:
 ```
-/opt/wolserver
+/etc/wolserver
 ```
 
-Copy executeable from ```/opt/wolserver/wolserver``` to ```/usr/bin/wolserver``` and download the required package:
+Copy executeable from ```/etc/wolserver/wolserver``` to ```/usr/bin/wolserver```, make it executeable and download the required ```wakeonlan``` package:
 ```
-sudo cp /opt/wolserver/wolserver /usr/bin/wolserver
+sudo cp /etc/wolserver/wolserver /usr/bin/wolserver
 ```
 ```
-sudo apt install wakeonlan
+sudo chmod +x /usr/bin/wolserver 
+```
+```
+sudo apt install wakeonlan python3-pip
 ```
 Create log directories:
 ```
@@ -30,13 +33,18 @@ sudo mkdir -p /var/log/wolserver/wakeup/
 sudo mkdir -p /var/log/wolserver/webclient/
 ```
 As long as you're running this script as root there are no adjustments concerning permissions required otherwise adjust the permissions that this script can access the log directory.
-Move system-services to it's correct directories and enable/start them:
+Move system-services to it's correct directories them:
 ```
-sudo mv /opt/wolserver/wolserver-http.service /etc/systemd/system
+sudo mv /etc/wolserver/wolserver-http.service /etc/systemd/system
 ```
 ```
-sudo mv /opt/wolserver/wolserver-wakeup.service /etc/systemd/system
+sudo mv /etc/wolserver/wolserver-wakeup.service /etc/systemd/system
 ```
+Then install all required python packages:
+```
+sudo pip3 install uvicorn fastapi
+```
+And finally start the webserver:
 ```
 sudo systemctl start wolserver-http.service
 ```
@@ -46,6 +54,7 @@ sudo systemctl enable wolserver*
 From now on all servers (entries in server.ini) will be waked up after reboot/startup.
 
 ## Configuration
+### wakeup.py
 There are two main config files: config.ini and server.ini
 Within the last one all servers that should be waked up are defined along this scheme:
 **Server entries format:**
@@ -57,6 +66,8 @@ ip = IPADDRESS
 ```
 ```mac``` and ```autowakeup``` are required, ```ip``` is optional.
 ```HOSTNAME``` must be uppercase!
+
+Both scripts will try to resolve the local hostname to provide URLs (Web/Email), be sure that your ```/etc/hosts``` is correct!
 
 The following values are hardcoded at the beginning of the main python file:
 **General configuration:**
@@ -81,6 +92,17 @@ Key | Setting
 If you do not want to use authentication only ```MAILSERVER```, ```MAILSERVERPORT```, ```EMAILSENDER``` and ```EMAILRECEIVER``` are required. 
 If you wish to disable mailing, just leave all values empty (replace with ```""```).
 
+### webclient.py
+
+The following values are hardcoded at the beginning of the main python file:
+**General configuration:**
+Key | Setting
+---|---
+```SERVERIP``` | Defines the IP of the server (default is loopback), change this, otherwise you won't be able to access the webserer via HTTP.
+```BASEDIR``` | Directory where the main python file is
+```SERVERSPATH``` | Path to ```servers.ini```, main config file for hosts to wakeup
+```LOGFILEDIR``` | Directory where the log file should be saved to (Remind to create this directory!)
+
 **A wrong/malformed config file can end up in errors!**
 
 ## Usage
@@ -98,6 +120,8 @@ List registered servers with:
 wolserver wakeup list
 ```
 
+## To-Do
+* Move all install instructions to an installation file
 
 
 

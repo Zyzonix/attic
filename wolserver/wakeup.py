@@ -21,7 +21,7 @@ import platform
 
 # base directory
 # PATHS must end with '/'!
-BASEDIR = "/opt/wolserver/"
+BASEDIR = "/etc/wolserver/"
 SERVERSPATH = BASEDIR + "servers.ini"
 LOGFILEDIR = "/var/log/wolserver/wakeup/"
 WAKEUPINTERVAL = 1
@@ -98,13 +98,16 @@ class hostInformation():
             result = resultEncoded.stdout.decode()[:-1]
             resultErr = resultEncoded.stderr.decode()[:-1]
             if resultErr:
-                logging.writeError(self, "Failed to get DNS suffix (command exited with error)")
+                logging.writeError("Failed to get DNS suffix (command exited with error)")
             else:
                 # in case of 'hostname hostname' --> only one time hostname
-                if " " in result:
+                if str(platform.node() + " ") in result:
+                    logging.write("Correcting retrieved hostname from " + result + " to " + platform.node())
                     hostInformation.fullHostname = platform.node()
                 else: hostInformation.fullHostname = result
-                logging.write(self, "Got full hostname successfully: " + hostInformation.fullHostname)                
+                logging.write("Got full hostname successfully: " + hostInformation.fullHostname)    
+                if hostInformation.fullHostname[len(hostInformation.fullHostname) - 1] == " ":
+                    hostInformation.fullHostname = hostInformation.fullHostname[:-1]           
         except:
             logging.writeError(self, "Failed to get full hostname")
             logging.writeExecError(self, traceback.format_exc())

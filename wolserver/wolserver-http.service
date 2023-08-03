@@ -1,5 +1,5 @@
 [Unit]
-Description=wolserver (/opt/wolserver) - Server Application: http://<hostname>
+Description=wolserver (/etc/wolserver) - Server Application: http://<hostname>
 Wants=network-online.target
 After=network.target network-online.target
 StartLimitIntervalSec=0

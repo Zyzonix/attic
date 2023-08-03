@@ -13,7 +13,7 @@
 #
 
 PYTHON=/usr/bin/python3
-BASEDIR=/opt/wolserver
+BASEDIR=/etc/wolserver
 
 # arguments after command
 KEY=$@

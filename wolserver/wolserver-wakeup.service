@@ -1,5 +1,5 @@
 [Unit]
-Description=wolserver (/opt/wolserver) - Auto Wakeup - Web-Application: http://<hostname>
+Description=wolserver (/etc/wolserver) - Auto Wakeup - Web-Application: http://<hostname>
 Wants=network-online.target
 After=network.target network-online.target
 StartLimitIntervalSec=0
