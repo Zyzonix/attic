@@ -1,6 +1,6 @@
 # wolserver 
 
-Tries to wakeup servers via Wake on LAN. Additionally provides a webserver to manually wakeup servers, CLI is also possible.
+Tries to wakeup servers via Wake on LAN (mainly after powerloss). Additionally provides a webserver to manually wakeup servers, CLI is also possible.
 
 We designed this script to be run on a Raspberry Pi. After a powerloss our UPS shut downs all our virtual hosts. Unfortunately it doesn't provide a feature to wake up devices when power is back. Our Raspberry Pi is not connected to the UPS so it shuts down on powerloss and reboots if power is back. When powered back on this script then tries to wake up our virtual hosts via Wake-on-LAN.
 
@@ -48,6 +48,9 @@ And finally start the webserver:
 ```
 sudo systemctl start wolserver-http.service
 ```
+The scripts are managed this way:
+* ```wolserver-http```: Service for the webinterface
+* ```wolserver-wakeup```: Service for autowakeup after (re)boot.
 ```
 sudo systemctl enable wolserver*
 ```
@@ -55,8 +58,8 @@ From now on all servers (entries in server.ini) will be waked up after reboot/st
 
 ## Configuration
 ### wakeup.py
-There are two main config files: config.ini and server.ini
-Within the last one all servers that should be waked up are defined along this scheme:
+
+Define your hosts to wakeup within the file ```servers.ini``` along this scheme:
 **Server entries format:**
 ```
 [HOSTNAME]
