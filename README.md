@@ -11,3 +11,4 @@ There are several very small scripts stored here carefully:
 - Proxmox Tweaks -> Remove subscription badge automatically
 - PVE-Alive -> Check if processes are running (Proxmox VE)
 - Observium-Scripts -> Install observium agent via script automatically on Debian/Artix
+- WakeOnLan Server (wolserer) -> Automatically wakeup UPS-connected clients after power-loss with a Raspberry Pi
