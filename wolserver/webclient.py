@@ -166,7 +166,7 @@ class server():
         }
         </style>
         <body>
-        <h1>''' + hostInformation.fullHostname + ''' / Wake-on-LAN Server<h1><h3>Registered servers:</h3><p>Please click on the hostname of the server you want to wakeup.</p>'''
+        <h1>''' + hostInformation.fullHostname + ''' / Wake-on-LAN Server</h1><h3>Registered servers:</h3><p>Please click on the hostname of the server you want to wakeup.</p>'''
         resp += "<hr>"
         hosts = config.getServersFomFile()
         if hosts:
