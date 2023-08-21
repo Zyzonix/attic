@@ -43,6 +43,8 @@ if [[ $OS == "PBS" || $OS == "pbs" ]]; then
     echo "Creating crontab"
     echo "$CRONBS" | /usr/bin/tee $CRONPATH
 
+    chmod +x $CRONPATH
+    
     echo "Installed Proxmox Tweaker"
     exit 0
 
@@ -57,6 +59,8 @@ elif [[ $OS == "PVE" || $OS == "pve" ]]; then
     echo "Creating crontab"
     echo "$CRONVE" | /usr/bin/tee $CRONPATH
 
+    chmod +x $CRONPATH
+    
     echo "Installed Proxmox Tweaker"
     exit 0
 
@@ -64,6 +68,3 @@ else
     echo "Was not able to read your input - returning."
     exit 1
 fi
-
-
-mkdir -p $PATH
