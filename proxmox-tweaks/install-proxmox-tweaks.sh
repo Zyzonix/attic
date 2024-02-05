@@ -9,7 +9,7 @@
 # 
 # file          | proxmox-tweaks/install-proxmox-tweaks.sh
 # project       | attic
-# file version  | 0.0.1
+# file version  | 0.0.2
 #
 
 BSSCRIPTURL=https://raw.githubusercontent.com/Zyzonix/attic/main/proxmox-tweaks/tweak-proxmox-bs.sh
@@ -20,6 +20,9 @@ CRONPATH=/etc/cron.daily/proxmox-tweaks
 
 CRONBS="/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-bs.sh"
 CRONVE="/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-ve.sh"
+
+# get download directory to delete script after installation
+DOWNDIR=$PWD
 
 # check if executed as root
 USR=$(/usr/bin/id -u)
@@ -46,6 +49,9 @@ if [[ $OS == "PBS" || $OS == "pbs" ]]; then
     # make crontab executeable
     /usr/bin/chmod +x $CRONPATH
     
+    echo "Cleaning up"
+    /usr/bin/rm $DOWNDIR/install-proxmox-tweaks.sh
+    echo ""
     echo "Installed Proxmox Tweaker"
     exit 0
 
@@ -63,6 +69,9 @@ elif [[ $OS == "PVE" || $OS == "pve" ]]; then
     # make crontab executeable
     /usr/bin/chmod +x $CRONPATH
     
+    echo "Cleaning up"
+    /usr/bin/rm $DOWNDIR/install-proxmox-tweaks.sh
+    echo ""
     echo "Installed Proxmox Tweaker"
     exit 0
 
