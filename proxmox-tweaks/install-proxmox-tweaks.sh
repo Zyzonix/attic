@@ -18,8 +18,10 @@ VESCRIPTURL=https://raw.githubusercontent.com/Zyzonix/attic/main/proxmox-tweaks/
 PATH=/usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/
 CRONPATH=/etc/cron.daily/proxmox-tweaks
 
-CRONBS="/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-bs.sh"
-CRONVE="/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-ve.sh"
+CRONBS="#!/usr/bin/bash
+/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-bs.sh"
+CRONVE="#!/usr/bin/bash
+/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-ve.sh"
 
 # get download directory to delete script after installation
 DOWNDIR=$PWD
