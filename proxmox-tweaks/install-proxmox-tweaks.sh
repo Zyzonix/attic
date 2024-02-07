@@ -19,9 +19,9 @@ PATH=/usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/
 CRONPATH=/etc/cron.daily/proxmox-tweaks
 
 CRONBS="#!/usr/bin/bash
-/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-bs.sh"
+/usr/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-bs.sh"
 CRONVE="#!/usr/bin/bash
-/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-ve.sh"
+/usr/bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-ve.sh"
 
 # get download directory to delete script after installation
 DOWNDIR=$PWD
