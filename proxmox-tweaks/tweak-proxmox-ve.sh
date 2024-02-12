@@ -25,9 +25,9 @@
 # Installation:
 # $ mkdir /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/
 # $ wget https://raw.githubusercontent.com/Zyzonix/attic/main/proxmox-tweaks/tweak-proxmox-ve.sh
-# then install a crontab under /etc/crontab to be run once a day: 
+# then install a crontab under /etc/cron.daily to be run once a day: 
 # # Auto tweak proxmox after each upgrade (https://github.com/Zyzonix/attic/proxmox-tweaks)
-# 1  0    * * *   root    /bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-ve.sh
+# /bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-ve.sh
 #
 
 
@@ -45,7 +45,7 @@ REPLACE1="if (false) {"
 if grep -q "$SEARCH1" "$PROXMOXLIBJS"; then
 
     echo "ProxmoxVE seems to got an update"
-    echo "tweak-proxmox-ve found lines to remove. Removing..."
+    echo "tweak-proxmox-ve.sh found lines to remove. Removing..."
     # create backup of old js-file
     cp $PROXMOXLIBJS $PROXMOXLIBJS.bak
 
