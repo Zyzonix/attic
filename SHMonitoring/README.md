@@ -22,7 +22,7 @@ mkdir -p /var/log/SHMonitoring
  - Download ```server.py``` and ```SHMonitoring.service``` 
  - Move the service file to the correct directory
 ```
-mv /root/SHMonitoring/SHMonitoring.service
+mv /root/SHMonitoring/SHMonitoring.service /etc/systemd/system
 ```  
  - Edit ```server.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on and ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
  - Install required Python packages: ```uvicorn``` and ```fastapi``` (either as ```python3-uvicorn``` and ```python3-fastapi``` or via ```pip3 install fastapi uvicorn```)
