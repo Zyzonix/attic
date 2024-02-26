@@ -1,0 +1,11 @@
+[Unit]
+Description=SHMonitoring Server
+After=network.target
+ 
+[Service]
+TimeoutStartSec=0
+ExecStart=/usr/bin/python3 /root/SHMonitoring/server.py
+WorkingDirectory=/root/SHMonitoring
+ 
+[Install]
+WantedBy=multi-user.target
