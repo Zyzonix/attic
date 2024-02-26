@@ -60,8 +60,11 @@ systemctl enable weatherstation-prometheus-exporter.service
 ```
 ```
 systemctl start weatherstation-prometheus-exporter.service
-```  
+```
  - Check the current output with
 ```
 journalctl -r -u weatherstation-prometheus-exporter.service
 ``` 
+
+## Development plans
+ - Add monitoring of CPU/Memory usage and CPU temperature to weatherstation
