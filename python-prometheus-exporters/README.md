@@ -18,7 +18,7 @@ mkdir -p /var/log/python-prometheus-exporters/
  - Download ```shelly.py``` and ```shelly-prometheus-exporter.service``` 
  - Move the service file to the correct directory
 ```
-mv /root/python-prometheus-exporters/shelly-prometheus-exporter.service
+mv /root/python-prometheus-exporters/shelly-prometheus-exporter.service /etc/systemd/system
 ```  
  - Edit ```shelly.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on and ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
  - Install required Python packages: ```uvicorn``` and ```fastapi``` (either as ```python3-uvicorn``` and ```python3-fastapi``` or via ```pip3 install fastapi uvicorn```)
