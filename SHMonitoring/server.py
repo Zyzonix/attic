@@ -22,8 +22,8 @@ import subprocess
 
 # base directory
 # PATHS must end with '/'!
-BASEDIR = "/root/shmonitoring/"
-LOGFILEDIR = "/var/log/shmonitoring/"
+BASEDIR = "/root/SHMonitoring/"
+LOGFILEDIR = "/var/log/SHMonitoring/"
 
 # link to shelly plug's webinterface must start with http:// and end with /
 SHELLYURL = "http://<shelly-url-here>/"
