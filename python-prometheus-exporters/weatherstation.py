@@ -9,7 +9,7 @@
 # 
 # file          | python-prometheus-exporters/weatherstation.py
 # project       | python-prometheus-exporters
-# file version  | 1.0
+# file version  | 2.0
 #
 
 from fastapi import FastAPI, Request
@@ -22,6 +22,7 @@ import subprocess
 from ctypes import c_short
 import smbus
 import time
+import psutil
 
 # base directory
 # PATHS must end with '/'!
@@ -117,6 +118,16 @@ class hostInformation():
         except:
             logging.writeError("Failed to get full hostname")
             logging.writeExecError(traceback.format_exc())
+
+# sysstats collector
+class sysstats():
+
+    # retrieving system statistics
+    def getSysStats():
+        cpu = psutil.cpu_percent(interval=1)
+        ram = psutil.virtual_memory().percent
+        cput = cput = float(open('/sys/class/thermal/thermal_zone0/temp').read())/1000
+        return cpu, ram, cput
 
 # sensor connection
 class ais():
@@ -305,12 +316,22 @@ class importData():
         result = {
             "currentTemperature" : 0,
             "currentHumidity" : 0,
-            "currentPressure" : 0
+            "currentPressure" : 0,
+            "currentCPUUsage" : 0,
+            "currentMemUsage" : 0,
+            "currentCPUTemp" : 0
         }
         try:
             result["currentTemperature"] = round(float(ais.getTemperature()[0]), 2)
             result["currentHumidity"] = round(float(ais.getHumidity()), 2)
             result["currentPressure"] = round(float(ais.getPressure()), 2)
+
+            sysstatsData = sysstats.getSysStats()
+            print(sysstatsData)
+            if sysstats:
+                result["currentCPUUsage"] = round(float(sysstatsData[0]), 2)
+                result["currentMemUsage"] = round(float(sysstatsData[1]), 2)
+                result["currentCPUTemp"] = round(float(sysstatsData[2]), 2)
                 
         except:
             logging.writeError("Failed to get data from sensors")
@@ -340,6 +361,24 @@ class server():
             answer += "# HELP weatherstation_pressure Current pressure in kPa \n" 
             answer += "# TYPE weatherstation_pressure gauge\n"
             answer += "weatherstation_pressure " + str(sensorData["currentPressure"]) + "\n"
+
+            answer += "\n"
+
+            answer += "# HELP weatherstation_cpu_usage Current CPU usage of rpi-weatherstation in % \n" 
+            answer += "# TYPE weatherstation_cpu_usage gauge\n"
+            answer += "weatherstation_cpu_usage " + str(sensorData["currentCPUUsage"]) + "\n"
+
+            answer += "\n"
+
+            answer += "# HELP weatherstation_mem_usage Current Memory usage of rpi-weatherstation in % \n" 
+            answer += "# TYPE weatherstation_mem_usage gauge\n"
+            answer += "weatherstation_mem_usage " + str(sensorData["currentMemUsage"]) + "\n"
+
+            answer += "\n"
+
+            answer += "# HELP weatherstation_cpu_temp Current CPU Temp of rpi-weatherstation in °C \n" 
+            answer += "# TYPE weatherstation_cpu_temp gauge\n"
+            answer += "weatherstation_cpu_temp " + str(sensorData["currentCPUTemp"]) + "\n"
 
             logging.write("Retrieved data successfully")
         else:
