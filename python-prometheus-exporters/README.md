@@ -5,7 +5,7 @@ The exporters in this repository were developed to be run on a Linux container, 
 **Current exporters:**
 Name | Type of use
 ---|---
-[Watchdog](exporter-for-watchdog) | Monitor connection to any server with ping
+[Watchdog](#exporter-for-watchdog) | Monitor connection to any server with ping
 [Shelly](#exporter-for-shellypm-plug) | Monitor ShellyPM, power usage ans Shelly system statistics
 [Weatherstation](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation)
 
