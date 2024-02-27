@@ -1,15 +1,16 @@
 # Python Prometheus Exporters
 
-The exporters in this repository were developed to be run on a Linux container, the following commands are prepared for ```systemd``-based distributions. 
+The exporters in this repository were developed to be run on a Linux container, the following commands are prepared for ```systemd```-based distributions. 
 
 **Current exporters:**
 Name | Type of use
 ---|---
-[Watchdog](exporter-for-watchdog-(internet-connection-monitor)) | Monitor connection to any server with ping
+[Watchdog](exporter-for-watchdog) | Monitor connection to any server with ping
 [Shelly](#exporter-for-shellypm-plug) | Monitor ShellyPM, power usage ans Shelly system statistics
 [Weatherstation](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation)
 
-## Exporter for watchdog (Internet connection monitor)
+## Exporter for watchdog 
+ - Internet connection monitor, checks ping to any webserver and provides the output in milliseconds
 ### Installation
 
 The installation process is quite easy:
