@@ -27,7 +27,8 @@ mkdir -p /var/log/python-prometheus-exporters/
 ```
 mv /root/python-prometheus-exporters/watchdog-prometheus-exporter.service /etc/systemd/system
 ```  
- - Edit ```watchdog.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on. **And customize ```URLSTOPING``` for the servers that should be pinged.**
+ - Edit ```watchdog.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on.
+ - **And customize ```URLSTOPING``` for the servers that should be pinged**: It's recommended to add a ping to your firewall/router to verify the functionality of the script. This ping then should be more or less next to 1ms.
  - Install required Python packages: ```uvicorn``` and ```fastapi``` (either as ```python3-uvicorn``` and ```python3-fastapi``` or via ```pip3 install fastapi uvicorn```)
  - Additionally check if the python-package ```ping3``` is installed, if not, a debian package is provided in ```packages/```.
  - Enable and start the server
