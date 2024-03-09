@@ -9,7 +9,7 @@
 # 
 # file          | ipfire-extensions/openvpn-notifier.py
 # project       | attic
-# file version  | 1.0
+# file version  | 1.1
 #
 import traceback
 import platform
@@ -24,8 +24,11 @@ VALIDITYDAYS=14
 # show vaild certs in mail
 SHOWVALID=True
 
+# email receiver
+EMAILRECEIVER=""
+
 # static variables
-VERSION=1.0
+VERSION=1.1
 
 # path to certs (must end with /)
 PATH="/var/ipfire/ovpn/certs/"
@@ -236,6 +239,9 @@ class mailHandler():
         
         # first import mail config
         result = mailHandler.getConfiguration()
+
+        # check if different mail receiver is configured
+        if EMAILRECEIVER: mailHandler.EMAILRECEIVER = EMAILRECEIVER
 
         if result and mailHandler.USEMAIL and mailHandler.EMAILRECEIVER and mailHandler.EMAILSENDER and mailHandler.MAILUSER and mailHandler.MAILSERVER and mailHandler.MAILPASSWORD and mailHandler.MAILSERVERPORT:
             # only import if enabled and import successful
