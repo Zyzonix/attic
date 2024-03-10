@@ -9,7 +9,7 @@
 # 
 # file          | ipfire-extensions/openvpn-notifier.py
 # project       | attic
-# file version  | 1.1
+# file version  | 1.2
 #
 import traceback
 import platform
@@ -28,7 +28,7 @@ SHOWVALID=True
 EMAILRECEIVER=""
 
 # static variables
-VERSION=1.1
+VERSION=1.2
 
 # path to certs (must end with /)
 PATH="/var/ipfire/ovpn/certs/"
@@ -191,47 +191,64 @@ class mailHandler():
     # main mail builder
     def buildMail(certsValid, certsExpiringSoon, certsExpired, certsCheckFailed):
         
-        mailText = ""
-        mailText += hostinformationHandler.getFullHostname() + " OpenVPN-Server - Certificate information \n"
+        mailText = '<font face="Courier New">'
+        mailText += '''
+        <style>
+        p { font-family: Courier New }
+        table, th, ts, td { 
+            font-family: Courier New;
+            border: none; 
+            text-align: left; 
+            width: 500px
+        }
+        tr:nth-child(even) {
+            background-color: #e0e0eb;
+        }
+        </style>
+        '''
+        mailText += hostinformationHandler.getFullHostname() + " OpenVPN-Server - Certificate information <br>"
 
         if certsExpiringSoon:
-            mailText += "\n------"
-            mailText += "\nCerts that will expire soon (fewer than " + str(VALIDITYDAYS) + " days):\n\n"
-            mailText += "Certificate Name: \t\tExpiring Date: \t\t\tDays left until expired:\n"
+            mailText += "------"
+            mailText += "<br><b>Certs that will expire soon (fewer than " + str(VALIDITYDAYS) + " days):</b><br>"
+            mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th><th>Days left until expired:</th></tr>"
             for cert in certsExpiringSoon.keys():
                 TABCOUNT = "\t\t"
                 if len(cert) < 14: TABCOUNT = "\t\t\t"
                 if len(cert) < 6: TABCOUNT = "\t\t\t\t"
-                mailText += "- " + cert + TABCOUNT + certsExpiringSoon[cert][1] + "\t\t" + certsExpiringSoon[cert][0] + "\n"
+                mailText += "<tr><td>" + cert + "</td><td>" + certsExpiringSoon[cert][1] + "</td><td>" + certsExpiringSoon[cert][0] + "</td></tr>"
+            mailText += "</table><br>"
 
         if certsExpired:
-            mailText += "\n------"
-            mailText += "\nCerts that already expired:\n\n"
-            mailText += "Certificate Name: \t\tExpiring Date:"
+            mailText += "------"
+            mailText += "<br><b>Certs that already expired:</b><br>"
+            mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th></tr>"
             for cert in certsExpired.keys():
                 TABCOUNT = "\t\t"
                 if len(cert) < 14: TABCOUNT = "\t\t\t"
                 if len(cert) < 6: TABCOUNT = "\t\t\t\t"
-                mailText += "- " + cert + TABCOUNT + certsExpired[cert] + "\n"
+                mailText += "<tr><td>" + cert + "</td><td>" + certsExpired[cert] + "</td></tr>"
+            mailText += "</table><br>"
 
         if certsValid and SHOWVALID:
-            mailText += "\n------"
-            mailText += "\nValid certificates:\n\n"
-            mailText += "Certificate Name: \t\tExpiring Date: \t\t\tDays left until expired:\n"
+            mailText += "------"
+            mailText += "<br>Valid certificates:<br>"
+            mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th><th>Days left until expired:</th></tr>"
             for cert in certsValid.keys():
                 TABCOUNT = "\t\t"
                 if len(cert) < 14: TABCOUNT = "\t\t\t"
                 if len(cert) < 6: TABCOUNT = "\t\t\t\t"
-                mailText += "- " + cert + TABCOUNT + certsValid[cert][1] + "\t\t" + certsValid[cert][0] + "\n"
+                mailText += "<tr><td>" + cert + "</td><td>" + certsValid[cert][1] + "</td><td>" + certsValid[cert][0] + "</td></tr>"
+            mailText += "</table><br>"
 
         if certsCheckFailed:
-            mailText += "\n------"
-            mailText += "\nFailed to check:\n\n"
-            for cert in certsCheckFailed: mailText += "- " + cert + "\n"
+            mailText += "------"
+            mailText += "<br>Failed to check:<br>"
+            for cert in certsCheckFailed: mailText += "- " + cert + "<br>"
 
-        mailText += "\n------\n"
-        mailText += "openvpn-notifier Version: " + str(VERSION) + "\n"
-        mailText += "Source code: https://github.com/Zyzonix/attic/tree/main/ipfire-extensions"
+        mailText += "------<br>"
+        mailText += "openvpn-notifier Version: " + str(VERSION) + "<br>"
+        mailText += "Source code: https://github.com/Zyzonix/attic/tree/main/ipfire-extensions </font>"
         return mailText
 
 
@@ -253,7 +270,6 @@ class mailHandler():
             logging.write("Building mail...")
 
             if mailHandler.MAILUSER and mailHandler.MAILPASSWORD:
-                logging.write(mailHandler.MAILSERVER)
                 smtp = smtplib.SMTP(mailHandler.MAILSERVER)
                 smtp.connect(mailHandler.MAILSERVER, mailHandler.MAILSERVERPORT)
                 smtp.ehlo()
@@ -265,14 +281,18 @@ class mailHandler():
                 smtp = smtplib.SMTP()
                 smtp.connect(mailHandler.MAILSERVER, mailHandler.MAILSERVERPORT)
             
-            subject = "VPN-Certificates will expire soon on [" + hostinformationHandler.getFullHostname() + "]"
+            subject = ""
+            # get number of certs that will expire soon
+            if certsExpiringSoon: subject += str(len(certsExpiringSoon.keys())) + " "
+
+            subject += "VPN-Certificates will expire soon on [" + hostinformationHandler.getFullHostname() + "]"
             msgRoot = MIMEMultipart("alternative")
             msgRoot['Subject'] = Header(subject, "utf-8")
             msgRoot['From'] = mailHandler.EMAILSENDER
             msgRoot['To'] = mailHandler.EMAILRECEIVER
             mailContent = mailHandler.buildMail(certsValid, certsExpiringSoon, certsExpired, certsCheckFailed)
             
-            mailText = MIMEText(mailContent, "plain", "utf-8")
+            mailText = MIMEText(mailContent, "html", "utf-8")
             msgRoot.attach(mailText)
 
             try:
