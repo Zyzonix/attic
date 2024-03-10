@@ -1,6 +1,6 @@
 # Extensions for IPFire (The Open Source Firewall)
 
-This directory contains some script that can be used as extensions for IPFire. 
+This directory contains some scripts that can be used as extensions for IPFire. 
 
 URL to IPFire: [ipfire.org](https://ipfire.org)
 
