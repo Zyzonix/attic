@@ -9,7 +9,7 @@
 # 
 # file          | ipfire-extensions/openvpn-notifier.py
 # project       | attic
-# file version  | 1.2
+# file version  | 1.3
 #
 import traceback
 import platform
@@ -28,7 +28,7 @@ SHOWVALID=True
 EMAILRECEIVER=""
 
 # static variables
-VERSION=1.2
+VERSION=1.3
 
 # path to certs (must end with /)
 PATH="/var/ipfire/ovpn/certs/"
@@ -370,9 +370,9 @@ class openvpnnotifier():
 
             if certs:
                 for cert in certs:
-                    # skip serverkey cert
-                    if "serverkey" in cert: break
-                    openvpnnotifier.checkValidity(cert)
+                    
+                    # skip serverkey certs
+                    if not ("serverkey" in cert): openvpnnotifier.checkValidity(cert)
 
                 # if any cert will expire soon or is already expired send mal
                 if openvpnnotifier.certsExpiringSoon or openvpnnotifier.certsExpired:
