@@ -26,8 +26,8 @@ import psutil
 
 # base directory
 # PATHS must end with '/'!
-BASEDIR = "/home/pi/python-prometheus-exporters/"
-LOGFILEDIR = "/var/log/python-prometheus-exporters/"
+BASEDIR = "/home/pi/python-exporters/"
+LOGFILEDIR = "/var/log/python-exporters/"
 
 # own server ip to bind webserver 
 SERVERIP="<IPv4-to-bind-on-here>"

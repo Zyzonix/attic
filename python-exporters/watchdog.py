@@ -29,8 +29,8 @@ from ping3 import ping
 
 # base directory
 # PATHS must end with '/'!
-BASEDIR = "/root/python-prometheus-exporters/"
-LOGFILEDIR = "/var/log/python-prometheus-exporters/"
+BASEDIR = "/root/python-exporters/"
+LOGFILEDIR = "/var/log/python-exporters/"
 
 # URLS to ping
 # TARGET-NAME must be without any special characters or a space, for example the TARGET-NAME for google.com would be googlecom
