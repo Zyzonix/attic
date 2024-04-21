@@ -11,7 +11,7 @@ Name | Type of use
 [Shelly - MySQL](#exporter-for-shellypm-plug-for-mysql) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to MySQL
 [Weatherstation - Prometheus](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation)
 
-## Exporter for watchdog 
+## Exporter for watchdog for Prometheus
  - Internet connection monitor, checks ping to any webserver and provides the output in milliseconds
 ### Installation
 
@@ -45,7 +45,7 @@ systemctl start watchdog-prometheus-exporter.service
 journalctl -r -u watchdog-prometheus-exporter.service
 ``` 
 
-## Exporter for watchdog 
+## Exporter for watchdog for MySQL
  - Internet connection monitor, checks ping to any webserver and provides the output in milliseconds
 ### Installation
 
