@@ -30,7 +30,6 @@ from ping3 import ping
 # base directory
 # PATHS must end with '/'!
 BASEDIR = "/root/python-exporters/"
-LOGFILEDIR = "/var/log/python-exporters/"
 
 # URLS to ping
 # TARGET-NAME must be without any special characters or a space, for example the TARGET-NAME for google.com would be googlecom
@@ -60,35 +59,18 @@ class ctime():
 
 class logging():
 
-    LOGGINGENABLED = True
-    LOGFILE = ""
-
-    def toFile(msg):
-        if logging.LOGGINGENABLED:
-            try:
-                # log file scheme e.g.: <name>_2023-01-01_12-10.log
-                logFile = open(LOGFILEDIR + logging.LOGFILE, "a")
-                logFile.write(msg + "\n")
-                logFile.close()
-            except:
-                logging.LOGGINGENABLED = False
-                logging.writeError("Failed to open logfile directory, maybe a permission error?")
-
     def write(msg):
         message = str(ctime.getTime() + " INFO   | " + str(msg))
         print(message)
-        logging.toFile(message)
 
     def writeError(msg):
         message = str(ctime.getTime() + " ERROR  | " + msg)
         print(message)
-        logging.toFile(message)
 
     # log/print error stack trace
     def writeExecError(msg):
         message = str(msg)
         print(message)
-        logging.toFile(message)
     
     def writeSubprocessout(msg):
         for line in msg:
@@ -98,7 +80,6 @@ class logging():
             logging.write("SYS   | " + line)
     
     def writeNix(self):
-        logging.toFile(self, "")
         print()
 
 class hostInformation():
@@ -182,7 +163,6 @@ class server():
         return answer
 
     def __init__(self):
-        logging.LOGFILE = "shelly_" + str(datetime.now().strftime("%Y-%m-%d")) + ".log"
         # get hostname and dns suffix
         hostInformation.get()
         uvicorn.run(app, port=8080, host=SERVERIP)
