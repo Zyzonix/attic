@@ -1,13 +1,14 @@
-# Python Prometheus Exporters
+# Python Exporters
 
 The exporters in this repository were developed to be run on a Linux container, the following commands are prepared for ```systemd```-based distributions. 
 
 **Current exporters:**
 Name | Type of use
 ---|---
-[Watchdog](#exporter-for-watchdog) | Monitor connection to any server with ping
-[Shelly](#exporter-for-shellypm-plug) | Monitor ShellyPM, power usage ans Shelly system statistics
-[Weatherstation](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation)
+[Watchdog - Prometheus](#exporter-for-watchdog) | Monitor connection to any server with ping
+[Shelly - Prometheus](#exporter-for-shellypm-plug) | Monitor ShellyPM, power usage ans Shelly system statistics
+[Shelly - MySQL](#exporter-for-shellypm-plug-mysql) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to MySQL
+[Weatherstation - Prometheus](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation)
 
 ## Exporter for watchdog 
  - Internet connection monitor, checks ping to any webserver and provides the output in milliseconds
@@ -17,15 +18,15 @@ The installation process is quite easy:
 
  - Create directories:
 ```
-mkdir -p /root/python-prometheus-exporters/
+mkdir -p /root/python-exporters/
 ```
 ```
-mkdir -p /var/log/python-prometheus-exporters/
+mkdir -p /var/log/python-exporters/
 ```
- - Download ```watchdog.py``` and ```watchdog-prometheus-exporter.service``` 
+ - Download ```watchdog.py``` and ```watchdo-exporter.service``` 
  - Move the service file to the correct directory
 ```
-mv /root/python-prometheus-exporters/watchdog-prometheus-exporter.service /etc/systemd/system
+mv /root/python-exporters/watchdog-exporter.service /etc/systemd/system
 ```  
  - Edit ```watchdog.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on.
  - **And customize ```URLSTOPING``` for the servers that should be pinged**: It's recommended to add a ping to your firewall/router to verify the functionality of the script. This ping then should be more or less next to 1ms.
@@ -33,14 +34,14 @@ mv /root/python-prometheus-exporters/watchdog-prometheus-exporter.service /etc/s
  - Additionally check if the python-package ```ping3``` is installed, if not, a debian package is provided in ```packages/```.
  - Enable and start the server
 ```
-systemctl enable watchdog-prometheus-exporter.service
+systemctl enable watchdog-exporter.service
 ```
 ```
-systemctl start watchdog-prometheus-exporter.service
+systemctl start watchdog-exporter.service
 ```
  - Check the current output with
 ```
-journalctl -r -u watchdog-prometheus-exporter.service
+journalctl -r -u watchdog-exporter.service
 ``` 
 
 ## Exporter for ShellyPM Plug
@@ -51,17 +52,17 @@ The installation process is quite easy:
 
  - Create directories:
 ```
-mkdir -p /root/python-prometheus-exporters/
+mkdir -p /root/python-exporters/
 ```
 ```
-mkdir -p /var/log/python-prometheus-exporters/
+mkdir -p /var/log/python-exporters/
 ```
- - Download ```shelly.py``` and ```shelly-prometheus-exporter.service``` 
+ - Download ```shelly2prometheus.py``` and ```shelly-prometheus-exporter.service``` 
  - Move the service file to the correct directory
 ```
-mv /root/python-prometheus-exporters/shelly-prometheus-exporter.service /etc/systemd/system
+mv /root/python-exporters/shelly-prometheus-exporter.service /etc/systemd/system
 ```  
- - Edit ```shelly.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on and ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
+ - Edit ```shelly2prometheus.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on and ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
  - Install required Python packages: ```uvicorn``` and ```fastapi``` (either as ```python3-uvicorn``` and ```python3-fastapi``` or via ```pip3 install fastapi uvicorn```)
  - Enable and start the server
 ```
@@ -75,6 +76,38 @@ systemctl start shelly-prometheus-exporter.service
 journalctl -r -u shelly-prometheus-exporter.service
 ```
 
+## Exporter for ShellyPM Plug MySQL
+
+### Installation
+
+The installation process is quite easy:
+
+ - Create directories:
+```
+mkdir -p /root/python-exporters/
+```
+```
+mkdir -p /var/log/python-exporters/
+```
+ - Download ```shelly2mysql.py``` and ```shelly-mysql-exporter.service``` 
+ - Move the service file to the correct directory
+```
+mv /root/python-exporters/shelly-mysql-exporter.service /etc/systemd/system
+```  
+ - Edit ```shelly2mysql.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on and ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
+ - Install required Python packages: ```uvicorn``` and ```fastapi``` (either as ```python3-uvicorn``` and ```python3-fastapi``` or via ```pip3 install fastapi uvicorn```)
+ - Enable and start the server
+```
+systemctl enable shelly-mysql-exporter.service
+```
+```
+systemctl start shelly-mysql-exporter.service
+```  
+ - Check the current output with
+```
+journalctl -r -u shelly-exporter.service
+```
+
 ## Exporter for rpi-weatherstation
 
 ### Installation
@@ -83,26 +116,26 @@ The installation process is quite easy:
 
  - Create directories:
 ```
-mkdir -p /root/python-prometheus-exporters/
+mkdir -p /root/python-exporters/
 ```
 ```
-mkdir -p /var/log/python-prometheus-exporters/
+mkdir -p /var/log/python-exporters/
 ```
- - Download ```weatherstation.py``` and ```weatherstation-prometheus-exporter.service``` 
+ - Download ```weatherstation.py``` and ```weatherstation-exporter.service``` 
  - Move the service file to the correct directory
 ```
-mv /root/python-prometheus-exporters/weatherstation-prometheus-exporter.service /etc/systemd/system
+mv /root/python--exporters/weatherstation-exporter.service /etc/systemd/system
 ```  
  - Edit ```weatherstation.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on.
  - Install required Python packages: ```uvicorn``` and ```fastapi``` (either as ```python3-uvicorn``` and ```python3-fastapi``` or via ```pip3 install fastapi uvicorn```)
  - Enable and start the server
 ```
-systemctl enable weatherstation-prometheus-exporter.service
+systemctl enable weatherstation-exporter.service
 ```
 ```
-systemctl start weatherstation-prometheus-exporter.service
+systemctl start weatherstation-exporter.service
 ```
  - Check the current output with
 ```
-journalctl -r -u weatherstation-prometheus-exporter.service
+journalctl -r -u weatherstation-exporter.service
 ``` 

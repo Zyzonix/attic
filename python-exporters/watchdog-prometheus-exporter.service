@@ -4,8 +4,8 @@ After=network.target
  
 [Service]
 TimeoutStartSec=0
-ExecStart=/usr/bin/python3 /root/python-prometheus-exporters/watchdog.py
-WorkingDirectory=/root/python-prometheus-exporters
+ExecStart=/usr/bin/python3 /root/python-exporters/watchdog.py
+WorkingDirectory=/root/python-exporters
  
 [Install]
 WantedBy=multi-user.target
