@@ -101,7 +101,6 @@ class importData():
             logging.writeExecError(traceback.format_exc())
         return result
 
-# web register points
 class dataHandler():
 
     # create db connection
