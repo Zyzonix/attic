@@ -6,8 +6,8 @@ The exporters in this repository were developed to be run on a Linux container, 
 Name | Type of use
 ---|---
 [Watchdog - Prometheus](#exporter-for-watchdog) | Monitor connection to any server with ping
-[Shelly - Prometheus](#exporter-for-shellypm-plug) | Monitor ShellyPM, power usage ans Shelly system statistics
-[Shelly - MySQL](#exporter-for-shellypm-plug-mysql) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to MySQL
+[Shelly - Prometheus](#exporter-for-shellypm-plug-for-prometheus) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to Prometheus
+[Shelly - MySQL](#exporter-for-shellypm-plug-for-mysql) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to MySQL
 [Weatherstation - Prometheus](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation)
 
 ## Exporter for watchdog 
@@ -44,7 +44,7 @@ systemctl start watchdog-exporter.service
 journalctl -r -u watchdog-exporter.service
 ``` 
 
-## Exporter for ShellyPM Plug
+## Exporter for ShellyPM Plug for Prometheus
 
 ### Installation
 
@@ -76,7 +76,7 @@ systemctl start shelly-prometheus-exporter.service
 journalctl -r -u shelly-prometheus-exporter.service
 ```
 
-## Exporter for ShellyPM Plug MySQL
+## Exporter for ShellyPM Plug for MySQL
 
 ### Installation
 
@@ -86,17 +86,15 @@ The installation process is quite easy:
 ```
 mkdir -p /root/python-exporters/
 ```
-```
-mkdir -p /var/log/python-exporters/
-```
  - Download ```shelly2mysql.py``` and ```shelly-mysql-exporter.service``` 
  - Move the service file to the correct directory
 ```
 mv /root/python-exporters/shelly-mysql-exporter.service /etc/systemd/system
-```  
- - Edit ```shelly2mysql.py```: Set ```SERVERIP``` to the IP on which the webbserver should bind on and ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
- - Install required Python packages: ```uvicorn``` and ```fastapi``` (either as ```python3-uvicorn``` and ```python3-fastapi``` or via ```pip3 install fastapi uvicorn```)
- - Enable and start the server
+```
+ - Install the ```python3-mysql-connector``` package from ```/packages/```  
+ - Edit ```shelly2mysql.py```: Set ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
+ - Configure the MySQL server and paste the required data to the static variables in the header section of this script. Required are ```MYSQLHOST```, ```MYSQLDATABASENAME```, ```MYSQLTABLENAME```, ```MYSQLUSER``` and ```MYSQLPW```.
+ - Enable and start the service
 ```
 systemctl enable shelly-mysql-exporter.service
 ```
