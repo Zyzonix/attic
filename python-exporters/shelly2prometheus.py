@@ -22,8 +22,8 @@ import subprocess
 
 # base directory
 # PATHS must end with '/'!
-BASEDIR = "/root/python-prometheus-exporters/"
-LOGFILEDIR = "/var/log/python-prometheus-exporters/"
+BASEDIR = "/root/python-exporters/"
+LOGFILEDIR = "/var/log/python-exporters/"
 
 # link to shelly plug's webinterface must start with http:// and end with /
 SHELLYURL = "http://<SHELLYURL-here>/"
