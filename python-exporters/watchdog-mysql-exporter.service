@@ -1,5 +1,5 @@
 [Unit]
-Description=Watchdog MySQL Exporter WebServer
+Description=Watchdog MySQL Exporter 
 After=network.target
  
 [Service]
