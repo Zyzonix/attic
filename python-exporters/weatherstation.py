@@ -7,8 +7,8 @@
 #
 # date created  | 26-02-2024 09:10:59
 # 
-# file          | python-prometheus-exporters/weatherstation.py
-# project       | python-prometheus-exporters
+# file          | python-exporters/weatherstation.py
+# project       | python-exporters
 # file version  | 2.0
 #
 

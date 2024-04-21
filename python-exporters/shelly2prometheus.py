@@ -7,8 +7,8 @@
 #
 # date created  | 26-02-2024 06:50:16
 # 
-# file          | python-prometheus-exporters/shelly.py
-# project       | python-prometheus-exporters
+# file          | python-exporters/shelly.py
+# project       | python-exporters
 # file version  | 1.0
 #
 from fastapi import FastAPI, Request

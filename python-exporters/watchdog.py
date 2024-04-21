@@ -8,7 +8,7 @@
 # date created  | 26-02-2024 09:58:18
 # 
 # file          | watchdog.py
-# project       | python-prometheus-exporters
+# project       | python-exporters
 # file version  | 1.0
 #
 
