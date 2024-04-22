@@ -11,12 +11,17 @@
 # project       | attic
 # file version  | 1.3
 #
+import email.charset
+import email.utils
 import traceback
 import platform
 import subprocess
 import traceback
 import os
 from datetime import datetime
+
+# Encode emails in UTF-8 by default
+email.charset.add_charset("utf-8", email.charset.SHORTEST, email.charset.QP, "utf-8")
 
 # remaining days of validity until notification
 VALIDITYDAYS=14
@@ -25,7 +30,7 @@ VALIDITYDAYS=14
 SHOWVALID=True
 
 # email receiver
-EMAILRECEIVER=""
+EMAILRECEIVER="<receiver-email-address>"
 
 # static variables
 VERSION=1.3
@@ -141,6 +146,7 @@ class mailHandler():
     MAILPASSWORD = ""
     EMAILRECEIVER = ""
     EMAILSENDER = ""
+    EMAILDOMAIN = ""
 
     # get mail configuration from directories
     def getConfiguration():
@@ -174,8 +180,15 @@ class mailHandler():
                 lineSplit = line.split(" ")
                 # remove \n 
                 lineSplit[len(lineSplit) - 1] = lineSplit[len(lineSplit) - 1].replace("\n", "")
-                if lineSplit[0] == "PORT": mailHandler.MAILSERVERPORT = lineSplit[1]
+                if lineSplit[0] == "PORT":  mailHandler.MAILSERVERPORT = lineSplit[1]
                 if lineSplit[0] == "SMARTHOST": mailHandler.MAILSERVER = lineSplit[1]
+
+            # set mail server domain for signing
+            if mailHandler.MAILSERVER:
+                domainSplit = mailHandler.MAILSERVER.split(".")
+                mailServerTopLevelDomain = domainSplit[len(domainSplit) - 1]
+                mailServerSecondLevelDomain = domainSplit[len(domainSplit) - 2]
+                mailHandler.EMAILDOMAIN = mailServerSecondLevelDomain + "." + mailServerTopLevelDomain
 
             mailconfFile.close()
             mailauthFile.close()
@@ -248,10 +261,9 @@ class mailHandler():
         # check if different mail receiver is configured
         if EMAILRECEIVER: mailHandler.EMAILRECEIVER = EMAILRECEIVER
 
-        if result and mailHandler.USEMAIL and mailHandler.EMAILRECEIVER and mailHandler.EMAILSENDER and mailHandler.MAILUSER and mailHandler.MAILSERVER and mailHandler.MAILPASSWORD and mailHandler.MAILSERVERPORT:
+        if result and mailHandler.USEMAIL and mailHandler.EMAILRECEIVER and mailHandler.EMAILSENDER and mailHandler.MAILUSER and mailHandler.MAILSERVER and mailHandler.MAILPASSWORD and mailHandler.MAILSERVERPORT and mailHandler.EMAILDOMAIN:
             # only import if enabled and import successful
             import smtplib
-            from email.mime.multipart import MIMEMultipart
             from email.mime.text import MIMEText
             from email.header import Header
 
@@ -273,15 +285,15 @@ class mailHandler():
             # get number of certs that will expire soon
             if certsExpiringSoon: subject += str(len(certsExpiringSoon.keys())) + " "
 
+            payload = mailHandler.buildMail(certsValid, certsExpiringSoon, certsExpired, certsCheckFailed)
+
             subject += "VPN-Certificates will expire soon on [" + hostinformationHandler.getFullHostname() + "]"
-            msgRoot = MIMEMultipart("alternative")
-            msgRoot['Subject'] = Header(subject, "utf-8")
+            msgRoot = MIMEText(payload, "html")
+            msgRoot['Subject'] = subject
             msgRoot['From'] = mailHandler.EMAILSENDER
             msgRoot['To'] = mailHandler.EMAILRECEIVER
-            mailContent = mailHandler.buildMail(certsValid, certsExpiringSoon, certsExpired, certsCheckFailed)
-            
-            mailText = MIMEText(mailContent, "html", "utf-8")
-            msgRoot.attach(mailText)
+            msgRoot.add_header("Message-Id", email.utils.make_msgid("openvpn-notifier", domain=mailHandler.EMAILDOMAIN))
+            msgRoot.add_header("Date", email.utils.formatdate())
 
             try:
                 smtp.sendmail(mailHandler.MAILUSER, mailHandler.EMAILRECEIVER, msgRoot.as_string())
@@ -307,7 +319,7 @@ class openvpnnotifier():
         allFilesInDir = os.listdir(directory)
         logging.write("Checking directory: " + directory)
         pemFiles = []
-
+        
         # check filetype
         for file in allFilesInDir:
             if file.endswith(".pem"):
@@ -367,13 +379,12 @@ class openvpnnotifier():
     def main():
         if PATH:
             certs = openvpnnotifier.getPEMs(PATH)
-
+            print(certs)
             if certs:
                 for cert in certs:
+                    # skip serverkey cert
+                    if not ("server" in cert): openvpnnotifier.checkValidity(cert)
                     
-                    # skip serverkey certs
-                    if not ("serverkey" in cert): openvpnnotifier.checkValidity(cert)
-
                 # if any cert will expire soon or is already expired send mal
                 if openvpnnotifier.certsExpiringSoon or openvpnnotifier.certsExpired:
                     mailHandler.sendMail(openvpnnotifier.certsValid, 
