@@ -139,6 +139,8 @@ journalctl -r -u shelly-exporter.service
 
 ## Exporter for rpi-weatherstation
 
+**Disclaimer: the services and scripts for rpi-weatherstation were developed to be run on a Raspberry Pi. Some scripts might contain the Pi's default user pi as user!**
+
 ### Installation
 
 The installation process is quite easy:
