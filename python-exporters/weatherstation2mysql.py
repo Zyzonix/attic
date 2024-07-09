@@ -298,6 +298,14 @@ class dataHandler():
         dataHandler.results["memory_usage"] = str(sysStats[1])
         dataHandler.results["cpu_temperature"] = str(sysStats[2])
 
+        # open DB connection
+        self.mySQLConnection = dataHandler.openMySQLConnection()
+        # if connection fails, return
+        if not self.testMySQLConnection: 
+            logging.writeError("failed connecting to mySQL server, check config - exiting.")
+            return
+        # get cursor
+        self.mySQLCursor = self.mySQLConnection.cursor()
 
         if dataHandler.results:
             SQLCommand = "INSERT INTO `weatherstation`(`time_utc`, `time_local`, `temperature`, `humidity`, `pressure`, `cpu_usage`, `memory_usage`, `cpu_temperature`)" 
@@ -310,20 +318,24 @@ class dataHandler():
         else:
             logging.writeError("Was not able to retrieve data")
 
+        # finally close DB connection
+        self.mySQLCursor.close()
+        self.mySQLConnection.close()
+
         
     def __init__(self):        
         logging.write("Started weatherstation2mysql")
 
-        # open mySQL connection
-        self.mySQLConnection = dataHandler.openMySQLConnection()
+        # open mySQL connection only for testing purposes
+        self.testMySQLConnection = dataHandler.openMySQLConnection()
         
         # if connection fails, return
-        if not self.mySQLConnection: 
+        if not self.testMySQLConnection: 
             logging.writeError("failed connecting to mySQL server, check config - exiting.")
             return
         
-        # get cursor
-        self.mySQLCursor = self.mySQLConnection.cursor()
+        # close test-connection 
+        self.testMySQLConnection.close()
         
         # start runner
         dataHandler.controller(self)
