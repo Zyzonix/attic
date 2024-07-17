@@ -1,0 +1,13 @@
+[Unit]
+Description=weatherstation MySQL Exporter 
+After=network.target
+ 
+[Service]
+User=pi
+Restart=always
+TimeoutStartSec=0
+ExecStart=/usr/bin/python3 /home/pi/python-exporters/weatherstation2mysql.py
+WorkingDirectory=/home/pi/python-exporters
+ 
+[Install]
+WantedBy=multi-user.target

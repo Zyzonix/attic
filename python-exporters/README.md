@@ -10,6 +10,7 @@ Name | Type of use
 [Shelly - Prometheus](#exporter-for-shellypm-plug-for-prometheus) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to Prometheus
 [Shelly - MySQL](#exporter-for-shellypm-plug-for-mysql) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to MySQL
 [Weatherstation - Prometheus](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation)
+[Weatherstation - MySQL](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation) and save data to MySQL
 
 ## Exporter for watchdog for Prometheus
  - Internet connection monitor, checks ping to any webserver and provides the output in milliseconds
@@ -137,6 +138,8 @@ journalctl -r -u shelly-exporter.service
 ```
 
 ## Exporter for rpi-weatherstation
+
+**Disclaimer: the services and scripts for rpi-weatherstation were developed to be run on a Raspberry Pi. Some scripts might contain the Pi's default user pi as user!**
 
 ### Installation
 
