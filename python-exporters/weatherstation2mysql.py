@@ -9,7 +9,7 @@
 # 
 # file          | weatherstation2mysql.py
 # project       | python-exporters
-# file version  | 1.0
+# file version  | 1.1
 #
 
 #
@@ -30,7 +30,7 @@ import time
 BASEDIR = "/home/pi/python-exporters/"
 
 # interval between rerun (in seconds)
-RERUNINTERVAL = 15
+RERUNINTERVAL = 60
 
 # mySQL settings
 MYSQLHOST = ""
@@ -301,26 +301,28 @@ class dataHandler():
         # open DB connection
         self.mySQLConnection = dataHandler.openMySQLConnection()
         # if connection fails, return
-        if not self.testMySQLConnection: 
-            logging.writeError("failed connecting to mySQL server, check config - exiting.")
-            return
-        # get cursor
-        self.mySQLCursor = self.mySQLConnection.cursor()
+        if self.testMySQLConnection: 
 
-        if dataHandler.results:
-            SQLCommand = "INSERT INTO `weatherstation`(`time_utc`, `time_local`, `temperature`, `humidity`, `pressure`, `cpu_usage`, `memory_usage`, `cpu_temperature`)" 
-            SQLCommand += "VALUES ('" + str(measurementTimeUTC) + "','" + str(measurementTimeLocal) + "','" + str(dataHandler.results["temperature"]) + "','" + str(dataHandler.results["humidity"]) + "','" + str(dataHandler.results["pressure"]) + "','" + str(dataHandler.results["cpu_usage"]) + "','" + str(dataHandler.results["memory_usage"]) + "','" + str(dataHandler.results["cpu_temperature"]) + "')"
-            
-            self.mySQLCursor.execute(SQLCommand)
-            self.mySQLConnection.commit()
+            # get cursor
+            self.mySQLCursor = self.mySQLConnection.cursor()
 
-            logging.write("Retrieved table successfully")
+            if dataHandler.results:
+                SQLCommand = "INSERT INTO `weatherstation`(`time_utc`, `time_local`, `temperature`, `humidity`, `pressure`, `cpu_usage`, `memory_usage`, `cpu_temperature`)" 
+                SQLCommand += "VALUES ('" + str(measurementTimeUTC) + "','" + str(measurementTimeLocal) + "','" + str(dataHandler.results["temperature"]) + "','" + str(dataHandler.results["humidity"]) + "','" + str(dataHandler.results["pressure"]) + "','" + str(dataHandler.results["cpu_usage"]) + "','" + str(dataHandler.results["memory_usage"]) + "','" + str(dataHandler.results["cpu_temperature"]) + "')"
+                
+                self.mySQLCursor.execute(SQLCommand)
+                self.mySQLConnection.commit()
+
+                logging.write("Retrieved table successfully")
+            else:
+                logging.writeError("Was not able to retrieve data")
+
+            # finally close DB connection
+            self.mySQLCursor.close()
+            self.mySQLConnection.close()
+
         else:
-            logging.writeError("Was not able to retrieve data")
-
-        # finally close DB connection
-        self.mySQLCursor.close()
-        self.mySQLConnection.close()
+            logging.writeError("failed connecting to mySQL server, check config - exiting.")
 
         
     def __init__(self):        
@@ -331,7 +333,7 @@ class dataHandler():
         
         # if connection fails, return
         if not self.testMySQLConnection: 
-            logging.writeError("failed connecting to mySQL server, check config - exiting.")
+            logging.writeError("(init) failed connecting to mySQL server, check config - exiting.")
             return
         
         # close test-connection 
