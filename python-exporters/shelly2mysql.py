@@ -7,23 +7,23 @@
 #
 # date created  | 26-02-2024 06:50:16
 # 
-# file          | python-exporters/shelly2mysql.py
+# file          | python-exporters/shelly.py
 # project       | python-exporters
-# file version  | 1.0
+# file version  | 1.1
 #
 from datetime import datetime, timezone
 import requests
-import platform, traceback
-import subprocess
+import traceback
+import time
 import mysql.connector
-import threading
 
 # base directory
 # PATHS must end with '/'!
 BASEDIR = "/root/python-exporters/"
+LOGFILEDIR = "/var/log/python-exporters/"
 
 # link to shelly plug's webinterface must start with http:// and end with /
-SHELLYURL = "http://<shelly's-ip>/"
+SHELLYURL = "http://<IP-of-SHELLY-plug>/"
 
 # interval between rerun (in seconds)
 RERUNINTERVAL = 10
@@ -42,6 +42,8 @@ class ctime():
         return curTime
 
 class logging():
+
+    LOGFILE = ""
 
     def write(msg):
         message = str(ctime.getTime() + " INFO   | " + str(msg))
@@ -101,6 +103,7 @@ class importData():
             logging.writeExecError(traceback.format_exc())
         return result
 
+# web register points
 class dataHandler():
 
     # create db connection
@@ -123,24 +126,35 @@ class dataHandler():
         else: return False
 
     def controller(self):
-        threading.Timer(RERUNINTERVAL, dataHandler.controller, [self]).start()
-        
-        logging.write("Requesting new data")
-        measurementTimeUTC = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-        measurementTimeLocal = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        shellyData = importData.importFromShelly()
-        if shellyData["retrievedData"]:
-            SQLCommand = "INSERT INTO `shellydata`(`time_utc`, `time_local`, `shelly_current_power`, `shelly_cpu_temp`, `shelly_ram_total`, `shelly_ram_free`, `shelly_fs_total`, `shelly_fs_free`, `shelly_total_power`)"
-            SQLCommand += "VALUES ('" + str(measurementTimeUTC) + "','" + str(measurementTimeLocal) + "','" + str(shellyData["currentPower"]) + "','" + str(shellyData["tmptC"]) + "','" + str(shellyData["ram_total"]) + "','" + str(shellyData["ram_free"]) + "','" + str(shellyData["fs_total"]) + "','" + str(shellyData["fs_free"]) + "','" + str(shellyData["totalPower"]) + "')"
-            self.mySQLCursor.execute(SQLCommand)
-            self.mySQLConnection.commit()
+        while True: 
 
-            logging.write("Retrieved table successfully")
-        else:
-            logging.writeError("Was not able to retrieve data from Shelly plug: '" + SHELLYURL + "status/'")
+            # save start time for sleep interval (running timedelta)
+            startTime = time.time()
 
+            logging.write("Requesting new data")
+            measurementTimeUTC = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+            measurementTimeLocal = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            shellyData = importData.importFromShelly()
+            if shellyData["retrievedData"]:
+                SQLCommand = "INSERT INTO `shellydata`(`time_utc`, `time_local`, `shelly_current_power`, `shelly_cpu_temp`, `shelly_ram_total`, `shelly_ram_free`, `shelly_fs_total`, `shelly_fs_free`, `shelly_total_power`)"
+                SQLCommand += "VALUES ('" + str(measurementTimeUTC) + "','" + str(measurementTimeLocal) + "','" + str(shellyData["currentPower"]) + "','" + str(shellyData["tmptC"]) + "','" + str(shellyData["ram_total"]) + "','" + str(shellyData["ram_free"]) + "','" + str(shellyData["fs_total"]) + "','" + str(shellyData["fs_free"]) + "','" + str(shellyData["totalPower"]) + "')"
+                self.mySQLCursor.execute(SQLCommand)
+                self.mySQLConnection.commit()
+
+                logging.write("Retrieved table successfully")
+            else:
+                logging.writeError("Was not able to retrieve data from Shelly plug: '" + SHELLYURL + "status/'")
+
+            # get end time for sleep interval (running timedelta)
+            endTime = time.time()
+            timedelta = endTime-startTime
+            logging.write("timedelta: " + str(timedelta))
+            time.sleep(RERUNINTERVAL - timedelta)
         
-    def __init__(self):        
+
+    def __init__(self):
+        logging.LOGFILE = "shelly2mysql_" + str(datetime.now().strftime("%Y-%m-%d")) + ".log"
+        
         logging.write("Started shelly2mysql")
 
         # open mySQL connection
