@@ -10,16 +10,21 @@
 # file          | rustdesk/install-rustdesk-debian.sh
 # project       | attic
 #
-echo "\n\nAdding repository key"
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
+printf "Adding repository key"
 curl -sS https://repo.zyzonix.net/ReleaseKey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/repo.zyzonix.net.gpg > /dev/null
 
-echo "\n\nAdding repository"
+printf "\nAdding repository\n"
 echo "deb [signed-by=/usr/share/keyrings/repo.zyzonix.net.gpg] https://repo.zyzonix.net/ stable main" | sudo tee /etc/apt/sources.list.d/repo.zyzonix.net.list
 
-echo "\n\nUpdating lists"
+printf "\n"
+printf "\nUpdating lists"
 apt update
 
-echo "\n\Installing rustdesk"
+printf "\n\nInstalling rustdesk"
 apt install rustdesk -y
-
-echo "Installed rustdesk successfully..."
+printf "Installed rustdesk successfully..."
