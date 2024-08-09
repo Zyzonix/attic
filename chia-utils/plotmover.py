@@ -18,6 +18,7 @@ import time
 import sys
 import psutil
 import shutil
+from datetime import datetime
 
 # sleep interval in seconds
 SLEEPINTERVAL = 60
@@ -39,7 +40,7 @@ finalPLOTSTOMOVE = []
 finalDirsSpaceLeft = []
 plotsMoved = {}
 
-print("---[NEW RUN]---")
+print("---[NEW RUN | " + str(datetime.now()) + "]---")
 if not TEMPDIR: 
     print("No TEMP dir defined - exiting...")
     sys.exit(0)
