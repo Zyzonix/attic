@@ -107,8 +107,8 @@ for plot in finalPLOTSTOMOVE:
         print("No disks left...")
         break    
     finalDirSelected = finalDirsSpaceLeft[0]
-    freeSpace = psutil.disk_usage(finalDirSelected).free - 50000000000
-    print("On device " + finalDirSelected + " are " + freeSpace + " bytes free.")
+    freeSpace = psutil.disk_usage(finalDirSelected).free - 10000000000
+    print("On device " + finalDirSelected + " are " + str(freeSpace) + " bytes free.")
     if freeSpace > prePLOTSTOMOVE[plot]:
         print("'" + plot + "' will be moved to " + finalDirSelected)
         shutil.move(TEMPDIR + plot, finalDirSelected)
@@ -121,8 +121,8 @@ for plot in finalPLOTSTOMOVE:
         # if first directory is too full, select another if possible
         if len(finalDirsSpaceLeft) >= 2:
             finalDirSelected = finalDirsSpaceLeft[1]
-            freeSpace = psutil.disk_usage(finalDirSelected).free - 50000000000
-            print("On device " + finalDirSelected + " are " + freeSpace + " bytes free.")
+            freeSpace = psutil.disk_usage(finalDirSelected).free - 10000000000
+            print("On device " + finalDirSelected + " are " + str(freeSpace) + " bytes free.")
             if freeSpace > prePLOTSTOMOVE[plot]:
                 print("'" + plot + "' will be moved to " + finalDirSelected)
                 shutil.move(TEMPDIR + plot, finalDirSelected)
