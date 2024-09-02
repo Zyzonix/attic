@@ -97,7 +97,7 @@ echo "Finished at:" $(/usr/bin/date '+%Y-%m-%d %H:%M:%S')
 ENDTIMERAW=$(date +%s)
 echo "Took" $(( (ENDTIMERAW - STARTTIMERAW) / 60)) "minutes."
 echo "Copying to remote server via SCP..."
-/usr/sshpass -p $REMOTESTORAGEUSERPASSWORD /usr/bin/scp -P $REMOTESTORAGESSHPORT $COMPLETEPATH $REMOTESTORAGEUSER@$REMOTESTORAGESERVER:$REMOTESTORAGEPATH
+/usr/bin/sshpass -p $REMOTESTORAGEUSERPASSWORD /usr/bin/scp -P $REMOTESTORAGESSHPORT $COMPLETEPATH $REMOTESTORAGEUSER@$REMOTESTORAGESERVER:$REMOTESTORAGEPATH
 echo "Copied tarball to remote storage"
 echo ""
 echo "» Backing up Nextcloud finished «"
