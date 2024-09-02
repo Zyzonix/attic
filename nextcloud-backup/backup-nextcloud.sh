@@ -9,12 +9,18 @@
 # 
 # file          | nextcloud-backup/backup-nextcloud.sh
 # project       | attic
-# file version  | 1.0.2
+# file version  | 1.1.0
 #
 
 # ----------------------------------------------------- #
 # davfs2 and etherwake are required to run this script! #
 # ----------------------------------------------------- #
+
+#
+# Setup information: 
+# 1. fill in all variables
+# 2. setup password-less authentication to remote storage (using ssh-copy-id)
+#
 
 MAILTO=root
 
@@ -23,7 +29,6 @@ REMOTESERVERMAC=
 REMOTESTORAGESERVER=
 REMOTESTORAGESSHPORT=22
 REMOTESTORAGEUSER=
-REMOTESTORAGEUSERPASSWORD=""
 # path on remove server to which the tarball should be copied
 REMOTESTORAGEPATH=
 
@@ -97,7 +102,7 @@ echo "Finished at:" $(/usr/bin/date '+%Y-%m-%d %H:%M:%S')
 ENDTIMERAW=$(date +%s)
 echo "Took" $(( (ENDTIMERAW - STARTTIMERAW) / 60)) "minutes."
 echo "Copying to remote server via SCP..."
-/usr/bin/sshpass -p $REMOTESTORAGEUSERPASSWORD /usr/bin/scp -P $REMOTESTORAGESSHPORT $COMPLETEPATH $REMOTESTORAGEUSER@$REMOTESTORAGESERVER:$REMOTESTORAGEPATH
+/usr/bin/scp -P $REMOTESTORAGESSHPORT $COMPLETEPATH $REMOTESTORAGEUSER@$REMOTESTORAGESERVER:$REMOTESTORAGEPATH
 echo "Copied tarball to remote storage"
 echo ""
 echo "» Backing up Nextcloud finished «"
