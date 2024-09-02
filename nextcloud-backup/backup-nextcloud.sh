@@ -50,6 +50,7 @@ TARBALLNAME=$CLOUDNAME"_"$(/usr/bin/date '+%Y-%m-%d_%H-%M-%S')
 STARTTIME=$(/usr/bin/date '+%Y-%m-%d %H:%M:%S')
 STARTTIMERAW=$(date +%s)
 
+echo "Waking up remote storage..."
 # waking up remote storage
 /usr/sbin/etherwake $REMOTESERVERMAC
 
@@ -104,6 +105,8 @@ echo "Took" $(( (ENDTIMERAW - STARTTIMERAW) / 60)) "minutes."
 echo "Copying to remote server via SCP..."
 /usr/bin/scp -P $REMOTESTORAGESSHPORT $COMPLETEPATH $REMOTESTORAGEUSER@$REMOTESTORAGESERVER:$REMOTESTORAGEPATH
 echo "Copied tarball to remote storage"
+echo "Removing local tarball"
+rm $COMPLETEPATH
 echo ""
 echo "» Backing up Nextcloud finished «"
 echo ""
