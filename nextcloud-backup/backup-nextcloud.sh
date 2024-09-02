@@ -46,7 +46,7 @@ STARTTIME=$(/usr/bin/date '+%Y-%m-%d %H:%M:%S')
 STARTTIMERAW=$(date +%s)
 
 # waking up remote storage
-/usr/bin/etherwake $REMOTESERVERMAC
+/usr/sbin/etherwake $REMOTESERVERMAC
 
 # wait 120 seconds to let server boot
 sleep 120
