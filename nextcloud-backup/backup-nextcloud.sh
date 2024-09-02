@@ -12,11 +12,15 @@
 # file version  | 1.0.0
 #
 
-# -------------------------------------- #
-# davfs2 is required to run this script! #
-# -------------------------------------- #
+# ---------------------------------------------------- #
+# davfs2 and etherwake is required to run this script! #
+# ---------------------------------------------------- #
 
 MAILTO=root
+
+# MAC and IP/DNS name of remote storage
+REMOTESERVERMAC=
+REMOTESTORAGESERVER=
 
 # simply copy the URL from your Nextcloud's Webinterface (WebDAV)
 NEXTCLOUDURL=
@@ -35,6 +39,20 @@ TARGETSTORAGEDIRECTORY=
 TARBALLNAME=$CLOUDNAME"_"$(/usr/bin/date '+%Y-%m-%d_%H-%M-%S')
 STARTTIME=$(/usr/bin/date '+%Y-%m-%d %H:%M:%S')
 STARTTIMERAW=$(date +%s)
+
+# waking up remote storage
+/usr/bin/etherwake $REMOTESERVERMAC
+
+# wait 120 seconds to let server boot
+sleep 120
+
+echo "Checking if storage is pingable"
+if ! ping -c 1 $REMOTESTORAGESERVER &> /dev/null
+then
+  echo "Storage server couldn't be waked up... returning"
+  exit
+fi
+echo "Server is pingable continuing..."
 
 echo ""
 echo "» Backing up Nextcloud «"
