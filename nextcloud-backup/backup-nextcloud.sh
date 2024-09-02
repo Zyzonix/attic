@@ -12,9 +12,10 @@
 # file version  | 1.1.0
 #
 
-# ----------------------------------------------------- #
-# davfs2 and etherwake are required to run this script! #
-# ----------------------------------------------------- #
+# ------------------------------------------------------------ #
+# davfs2 and etherwake are required to run this script!        #
+# when running in a Proxmox CT enable FUSE in options>features #
+# ------------------------------------------------------------ #
 
 #
 # Setup information: 
