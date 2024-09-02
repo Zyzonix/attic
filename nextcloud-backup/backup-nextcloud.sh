@@ -9,7 +9,7 @@
 # 
 # file          | nextcloud-backup/backup-nextcloud.sh
 # project       | attic
-# file version  | 1.0.0
+# file version  | 1.0.2
 #
 
 # ---------------------------------------------------- #
@@ -21,6 +21,11 @@ MAILTO=root
 # MAC and IP/DNS name of remote storage
 REMOTESERVERMAC=
 REMOTESTORAGESERVER=
+REMOTESTORAGESSHPORT=22
+REMOTESTORAGEUSER=
+REMOTESTORAGEUSERPASSWORD=""
+# path on remove server to which the tarball should be copied
+REMOTESTORAGEPATH=
 
 # simply copy the URL from your Nextcloud's Webinterface (WebDAV)
 NEXTCLOUDURL=
@@ -91,6 +96,9 @@ echo ""
 echo "Finished at:" $(/usr/bin/date '+%Y-%m-%d %H:%M:%S')
 ENDTIMERAW=$(date +%s)
 echo "Took" $(( (ENDTIMERAW - STARTTIMERAW) / 60)) "minutes."
+echo "Copying to remote server via SCP..."
+/usr/sshpass -p $REMOTESTORAGEUSERPASSWORD /usr/bin/scp -P $REMOTESTORAGESSHPORT $COMPLETEPATH $REMOTESTORAGEUSER@$REMOTESTORAGESERVER:$REMOTESTORAGEPATH
+echo "Copied tarball to remote storage"
 echo ""
 echo "» Backing up Nextcloud finished «"
 echo ""
