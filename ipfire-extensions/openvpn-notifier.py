@@ -287,7 +287,7 @@ class mailHandler():
 
             payload = mailHandler.buildMail(certsValid, certsExpiringSoon, certsExpired, certsCheckFailed)
 
-            subject += "VPN-Certificates will expire soon on [" + hostinformationHandler.getFullHostname() + "]"
+            subject += "VPN-Certificate(s) will expire soon on [" + hostinformationHandler.getFullHostname() + "]"
             msgRoot = MIMEText(payload, "html")
             msgRoot['Subject'] = subject
             msgRoot['From'] = mailHandler.EMAILSENDER
