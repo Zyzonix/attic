@@ -114,7 +114,7 @@ if [ -f /etc/os-release ]; then
     mkdir -p $AGENTDIR
     mkdir -p $AGENTDIR/scripts-available
     mkdir -p $AGENTDIR/scripts-enabled
-    $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/agent-local/* /usr/lib/observium_agent/scripts-available
+    $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -r -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/agent-local/* /usr/lib/observium_agent/scripts-available/
 
     echo ""
     echo "You can now link the scripts to '"$AGENTDIR/scripts-enabled"' as example via "
