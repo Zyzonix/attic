@@ -126,6 +126,6 @@ if [ -f /etc/os-release ]; then
 fi
 
 if [ $ID == "XXX" ]; then
-
+   echo "Failed to detect OS."
 fi
 exit 0
