@@ -101,8 +101,7 @@ if [ -f /etc/os-release ]; then
     $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/observium_agent_xinetd /etc/xinetd.d/observium_agent_xinetd
 
     echo ""
-    echo "Enabling and restarting xinetd"
-    $XINETDENABLE
+    echo "Enabling xinetd"
     $XINETDRESTART
 
     echo ""
@@ -115,6 +114,10 @@ if [ -f /etc/os-release ]; then
     mkdir -p $AGENTDIR/scripts-available
     mkdir -p $AGENTDIR/scripts-enabled
     $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -r -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/agent-local/* /usr/lib/observium_agent/scripts-available/
+
+    echo ""
+    echo "Restarting xinetd"
+    $XINETDRESTART
 
     echo ""
     echo "You can now link the scripts to '"$AGENTDIR/scripts-enabled"' as example via "
