@@ -9,7 +9,7 @@
 # 
 # file          | observium-agent-quick-install.sh
 # project       | observium-scripts
-# file version  | 0.0.2
+# file version  | 0.0.3
 #
 
 echo "#################################################################"
@@ -46,6 +46,10 @@ SSHPASSPATH=/usr/bin/sshpass
 SSHKEYGENPATH=/usr/bin/ssh-keygen
 AGENTDIR=/usr/lib/observium_agent
 
+# select whether to install via systemd-socket or xinetd
+INSTALLSYSTEMD=false
+INSTALLXINETD=false
+
 ID=XXX
 echo "Currently supported and tested distributions are Debian/Ubuntu and ArtixLinux."
 echo "Getting OS..."
@@ -55,6 +59,9 @@ if [ -f /etc/os-release ]; then
     ID=$ID
 
     if [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ]; then
+      SYSTEMDDAEMONRELOAD="systemctl daemon-reload"
+      SYSTEMDENABLE="systemctl enable observium_agent.socket"
+      SYSTEMDRESTART="systemctl restart observium_agent.socket"
       XINETDENABLE="/usr/bin/systemctl enable xinetd.service"
       XINETDRESTART="/usr/bin/systemctl restart xinetd.service"
       UPDATEGETPATH=/usr/bin/apt-get
@@ -64,6 +71,15 @@ if [ -f /etc/os-release ]; then
       echo ""
       $UPDATEGETPATH update 
       $UPDATEGETPATH install xinetd sshpass -y
+
+      # decide whether to install via systemd or xinetd
+      read -p "Install via systemd or xinetd (Enter 'systemd' or 'xinetd', pressing any other key will install via systemd): " INSTALLATIONMETHOD
+
+      if [ $INSTALLATIONMETHOD == "xinetd" ]; then
+        INSTALLXINETD=true
+      else 
+        INSTALLSYSTEMD=true
+      fi
 
     elif [ "$ID" = "artix" ]; then
       XINETDENABLE="/usr/bin/rc-update add xinetd"
@@ -75,6 +91,9 @@ if [ -f /etc/os-release ]; then
       echo ""
       $UPDATEGETPATH update 
       $UPDATEGETPATH -S xinetd-openrc sshpass  --noconfirm
+
+      # install xinetd; artix doesn't use systemd
+      INSTALLXINETD=true
 
     else
       echo ""
@@ -96,13 +115,28 @@ if [ -f /etc/os-release ]; then
     echo -n "Please enter the password for root@"$OBSERVIUMIP": " 
     read -s OBSERVIUMROOTPW
 
-    echo ""
-    echo "Copying xinetd script from observium"
-    $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/observium_agent_xinetd /etc/xinetd.d/observium_agent_xinetd
 
-    echo ""
-    echo "Enabling xinetd"
-    $XINETDRESTART
+    if [ $INSTALLSYSTEMD == "true" ]; then
+      echo ""
+      echo "Copying systemd socket and service from observium"
+      $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/systemd/observium_agent.service /etc/systemd/system/observium_agent\@.service
+      $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/systemd/observium_agent.socket /etc/systemd/system/observium_agent.socket
+
+      echo ""
+      echo "Enabling and starting systemd socket"
+      $SYSTEMDDAEMONRELOAD
+      $SYSTEMDENABLE
+      $SYSTEMDRESTART
+
+    elif [ $INSTALLSYSTEMD == "false" ]; then
+      echo ""
+      echo "Copying xinetd script from observium"
+      $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/observium_agent_xinetd /etc/xinetd.d/observium_agent_xinetd
+
+      echo ""
+      echo "Enabling xinetd"
+      $XINETDRESTART
+    fi
 
     echo ""
     echo "Copying observium agent from observium"
@@ -115,9 +149,16 @@ if [ -f /etc/os-release ]; then
     mkdir -p $AGENTDIR/scripts-enabled
     $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -r -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/agent-local/* /usr/lib/observium_agent/scripts-available/
 
-    echo ""
-    echo "Restarting xinetd"
-    $XINETDRESTART
+    if [ $INSTALLSYSTEMD == "true" ]; then
+      echo ""
+      echo "Restarting systemd socket"
+      $SYSTEMDRESTART
+
+    elif [ $INSTALLSYSTEMD == "false" ]; then   
+      echo ""
+      echo "Restarting xinetd"
+      $XINETDRESTART
+    fi
 
     echo ""
     echo "You can now link the scripts to '"$AGENTDIR/scripts-enabled"' as example via "
