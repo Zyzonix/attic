@@ -67,16 +67,20 @@ if [ -f /etc/os-release ]; then
       UPDATEGETPATH=/usr/bin/apt-get
 
       echo ""
-      echo "Updating and installing xinetd and sshpass"
+      echo "Updating and installing sshpass..."
       echo ""
       $UPDATEGETPATH update 
       $UPDATEGETPATH install sshpass -y
 
       # decide whether to install via systemd or xinetd
+      echo ""
       read -p "Install via systemd or xinetd (Enter 'systemd' or 'xinetd', pressing any other key will install via systemd): " INSTALLATIONMETHOD
 
       if [ $INSTALLATIONMETHOD == "xinetd" ]; then
         INSTALLXINETD=true
+
+        echo ""
+        echo "Installing xinetd..."
         $UPDATEGETPATH install xinetd -y
       else 
         INSTALLSYSTEMD=true
