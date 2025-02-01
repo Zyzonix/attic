@@ -76,7 +76,7 @@ if [ -f /etc/os-release ]; then
       echo ""
       read -p "Install via systemd or xinetd (Enter 'systemd' or 'xinetd', pressing any other key will install via systemd): " INSTALLATIONMETHOD
 
-      if [ "$INSTALLATIONMETHOD" = "xinetd" ]; then
+      if [[ "$INSTALLATIONMETHOD" = "xinetd" ]]; then
         INSTALLXINETD=true
 
         echo ""
@@ -121,7 +121,7 @@ if [ -f /etc/os-release ]; then
     read -s OBSERVIUMROOTPW
 
 
-    if [ "$INSTALLSYSTEMD" = "true" ]; then
+    if [[ "$INSTALLSYSTEMD" = "true" ]]; then
       echo ""
       echo "Copying systemd socket and service from observium"
       $SSHPASSPATH -p $OBSERVIUMROOTPW $SCPPATH -o StrictHostKeyChecking=no -P $OBSERVIUMPORT $OBSERVIUMUSER@$OBSERVIUMIP:$OBSERVIUMPATH/scripts/systemd/observium_agent.service /etc/systemd/system/observium_agent\@.service
