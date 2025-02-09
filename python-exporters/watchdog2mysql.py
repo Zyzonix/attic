@@ -84,7 +84,7 @@ class collectData():
     async def testConnection(target):
         try:
             url = URLSTOPING[target]
-            responseInS = ping(url)
+            responseInS = ping(url, timeout=10)
             responseInMs = round(responseInS*1000, 2)
             dataHandler.results[target] = responseInMs
             logging.write("Connecting to " + url + " took " + str(responseInMs) + "ms")
