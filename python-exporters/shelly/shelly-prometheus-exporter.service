@@ -1,0 +1,11 @@
+[Unit]
+Description=Shelly Prometheus Exporter WebServer
+After=network.target
+ 
+[Service]
+TimeoutStartSec=0
+ExecStart=/usr/bin/python3 /root/python-exporters/shelly2prometheus.py
+WorkingDirectory=/root/python-exporters
+ 
+[Install]
+WantedBy=multi-user.target

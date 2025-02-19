@@ -1,0 +1,12 @@
+[Unit]
+Description=Watchdog MySQL Exporter 
+After=network.target
+ 
+[Service]
+Restart=always
+TimeoutStartSec=0
+ExecStart=/usr/bin/python3 /root/python-exporters/watchdog2mysql.py
+WorkingDirectory=/root/python-exporters
+ 
+[Install]
+WantedBy=multi-user.target

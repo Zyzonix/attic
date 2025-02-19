@@ -1,0 +1,13 @@
+[Unit]
+Description=Shelly MySQL Exporter
+After=network.target
+ 
+[Service]
+Restart=always
+TimeoutStartSec=0
+ExecStartPre=/bin/sleep 30
+ExecStart=/usr/bin/python3 /root/python-exporters/shelly2mysql.py
+WorkingDirectory=/root/python-exporters
+ 
+[Install]
+WantedBy=multi-user.target
