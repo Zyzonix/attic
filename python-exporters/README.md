@@ -11,6 +11,7 @@ Name | Type of use
 [Shelly - MySQL](#exporter-for-shellypm-plug-for-mysql) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to MySQL
 [Weatherstation - Prometheus](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation)
 [Weatherstation - MySQL](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation) and save data to MySQL
+[Radiation - MySQL](#exporter-for-geiger-counter-sen0463-for-mysql) | Monitor DFRobot Geiger Counter SEN0463 and save data to MySQL
 
 ## Exporter for watchdog for Prometheus
  - Internet connection monitor, checks ping to any webserver and provides the output in milliseconds
@@ -170,3 +171,33 @@ systemctl start weatherstation-exporter.service
 ```
 journalctl -r -u weatherstation-exporter.service
 ``` 
+## Exporter for Geiger Counter SEN0463 for MySQL
+
+Script is designed to request data from DFRobots SEN0463 Geiger Counter: [wiki.dfrobot.com - SKU_SEN0463 Gravity Geiger Counter](https://wiki.dfrobot.com/SKU_SEN0463_Gravity_Geiger_Counter_Module)
+
+### Installation
+
+The installation process is quite easy:
+
+ - Create directories:
+```
+mkdir -p /opt/python-exporters/
+```
+ - Download ```radiation2mysql.py``` and ```radiation-mysql-exporter.service``` 
+ - Move the service file to the correct directory
+```
+mv /opt/python-exporters/radiation-mysql-exporter.service /etc/systemd/system
+```
+ - Install the ```python3-mysql-connector``` package from ```/packages/``` and install the package required for the GPIO communication: ```python3-rpi-lgpio```
+ - Configure the MySQL server and paste the required data to the static variables in the header section of this script. Required are ```MYSQLHOST```, ```MYSQLDATABASENAME```, ```MYSQLTABLENAME```, ```MYSQLUSER``` and ```MYSQLPW```.
+ - Enable and start the service
+```
+systemctl enable radiation-mysql-exporter.service
+```
+```
+systemctl start radiation-mysql-exporter.service
+```  
+ - Check the current output with
+```
+journalctl -r -u radiation-mysql-exporter.service
+```
