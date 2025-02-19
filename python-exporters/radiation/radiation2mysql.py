@@ -34,6 +34,7 @@ BASEDIR = "/opt/python-exporters/"
 # interval between rerun (in seconds)
 RERUNINTERVAL = 60
 
+# calculate from counts per minute to micro Sivert per hour
 USVHFACTOR = 1.0/153.8  # sourced from https://wiki.dfrobot.com/SKU_SEN0463_Gravity_Geiger_Counter_Module#target_1
 
 # mySQL settings
