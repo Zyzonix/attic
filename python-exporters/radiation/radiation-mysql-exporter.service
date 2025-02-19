@@ -1,0 +1,12 @@
+[Unit]
+Description=Radiation MySQL Exporter 
+After=network.target
+ 
+[Service]
+Restart=always
+TimeoutStartSec=0
+ExecStart=/usr/bin/python3 /opt/python-exporters/watchdog2mysql.py
+WorkingDirectory=/opt/python-exporters
+ 
+[Install]
+WantedBy=multi-user.target
