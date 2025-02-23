@@ -9,7 +9,7 @@
 # 
 # file          | radiation2mysql.py
 # project       | python-exporters
-# file version  | 1.0
+# file version  | 1.1
 #
 
 #
@@ -30,9 +30,6 @@ from collections import deque
 # base directory
 # PATHS must end with '/'!
 BASEDIR = "/opt/python-exporters/"
-
-# interval between rerun (in seconds)
-RERUNINTERVAL = 60
 
 # calculate from counts per minute to micro Sivert per hour
 USVHFACTOR = 1.0/153.8  # sourced from https://wiki.dfrobot.com/SKU_SEN0463_Gravity_Geiger_Counter_Module#target_1
@@ -100,7 +97,7 @@ class dataHandler():
         else: return False
 
 
-    def storeData(self, measurementTimeUTC, measurementTimeLocal, cpm, usvh):
+    def storeData(self, startTimeUTC, startTimeLocal, endTimeUTC, endTimeLocal, cph, cpm, usvh):
 
         # open DB connection
         self.mySQLConnection = dataHandler.openMySQLConnection()
@@ -110,8 +107,8 @@ class dataHandler():
             # get cursor
             self.mySQLCursor = self.mySQLConnection.cursor()
 
-            SQLCommand = "INSERT INTO `radiation`(`time_utc`, `time_local`, `cpm`, `usvh`)" 
-            SQLCommand += "VALUES ('" + str(measurementTimeUTC) + "','" + str(measurementTimeLocal) + "','" + str(cpm) + "','" + str(usvh) + "')"
+            SQLCommand = "INSERT INTO `radiation`(`start_time_utc`, `start_time_local`, `start_time_utc`, `start_time_local`, `cph`, `cpm`, `usvh`)" 
+            SQLCommand += "VALUES ('" + str(startTimeUTC) + "','" + str(startTimeLocal) + "','" + str(endTimeUTC) + "','" + str(endTimeLocal) + "','" + str(cph) + "','" + str(cpm) + "','" + str(usvh) + "')"
             
             self.mySQLCursor.execute(SQLCommand)
             self.mySQLConnection.commit()
@@ -126,29 +123,47 @@ class dataHandler():
 
     def controller(self):        
         firstRun = True
+        # remember timestamps
+        startTimeUTC = ""
+        startTimeLocal = ""
+
+        # interval between rerun (in seconds)
+        # should be one hour, to calculate uSv per hour
+        RERUNINTERVAL = 3600
 
         while True:
             # save start time for sleep interval (running timedelta)
             startTime = time.time()
 
-            cpm = int(len(counts))
-            microsieverts = cpm*USVHFACTOR
+            # sould only run once an hour, so no calculation required
+            cph = int(len(counts))
+
+            # counts per minute, RERUNINTERVAL in seconds
+            cpm = int(len(counts))/RERUNINTERVAL*60
+            microsieverts = cph/60*USVHFACTOR
+
+            measurementEndTimeUTC = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+            measurementEndTimeLocal = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             counts.clear()
+
+            measurementStartTimeUTC = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+            measurementStartTimeLocal = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
             measurements = [
             {
                 'measurement': 'radiation',
                 'fields': {
+                    'startTimeUTC' : startTimeUTC,
+                    'endTimeUTC' : measurementEndTimeUTC,
+                    'cph' : cph,
                     'cpm': cpm,
                     'usvh': microsieverts
                     }
             }
             ]
 
-            measurementTimeUTC = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-            measurementTimeLocal = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
             logging.write(measurements)
-            if not firstRun: dataHandler.storeData(self, measurementTimeUTC, measurementTimeLocal, cpm, microsieverts)
+            if not firstRun: dataHandler.storeData(self, startTimeUTC, startTimeLocal, measurementEndTimeUTC, measurementEndTimeLocal, cph, cpm, microsieverts)
             else: logging.write("First run - skipping SQL storing")
 
             # get end time for sleep interval (running timedelta)
@@ -156,6 +171,11 @@ class dataHandler():
             timedelta = endTime-startTime
             #logging.write("timedelta: " + str(timedelta))
             firstRun = False
+
+            # save timestamps
+            startTimeUTC = measurementStartTimeUTC
+            startTimeLocal = measurementStartTimeLocal
+
             time.sleep(RERUNINTERVAL - timedelta)   
 
     # counter by adding timestamp to array
@@ -197,7 +217,9 @@ class dataHandler():
 
         # start runner
         while True:
-            if datetime.datetime.now().second == 0:
+
+            # start only on xx:xx:00.000
+            if datetime.datetime.now().minute == 0:
                 counts.clear()
                 dataHandler.controller(self)
         

@@ -28,8 +28,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `radiation` (
-  `time_utc` datetime NOT NULL,
-  `time_local` datetime NOT NULL,
+  `start_time_utc` datetime NOT NULL,
+  `start_time_local` datetime NOT NULL,
+  `end_time_utc` datetime NOT NULL,
+  `end_time_local` datetime NOT NULL,  
+  `cph` int(11) NOT NULL,
   `cpm` int(11) NOT NULL,
   `usvh` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
