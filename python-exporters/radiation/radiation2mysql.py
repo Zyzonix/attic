@@ -107,7 +107,7 @@ class dataHandler():
             # get cursor
             self.mySQLCursor = self.mySQLConnection.cursor()
 
-            SQLCommand = "INSERT INTO `radiation`(`start_time_utc`, `start_time_local`, `start_time_utc`, `start_time_local`, `cph`, `cpm`, `usvh`)" 
+            SQLCommand = "INSERT INTO `radiation`(`start_time_utc`, `start_time_local`, `end_time_utc`, `end_time_local`, `cph`, `cpm`, `usvh`)" 
             SQLCommand += "VALUES ('" + str(startTimeUTC) + "','" + str(startTimeLocal) + "','" + str(endTimeUTC) + "','" + str(endTimeLocal) + "','" + str(cph) + "','" + str(cpm) + "','" + str(usvh) + "')"
             
             self.mySQLCursor.execute(SQLCommand)
