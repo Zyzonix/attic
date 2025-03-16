@@ -24,7 +24,6 @@
 import datetime
 import traceback
 import mysql.connector
-import time
 import urllib.request, json 
 
 # base directory
@@ -34,10 +33,11 @@ BASEDIR = "/opt/python-exporters/"
 # mySQL settings
 MYSQLHOST = ""
 MYSQLDATABASENAME = ""
-MYSQLTABLENAME = "radiation_importFromBfS"
+MYSQLTABLENAME = ""
 MYSQLUSER = ""
 MYSQLPW = ""
 
+# for example 020010004
 locations = {
     "location1" : "",
     "location2" : "",
@@ -116,8 +116,7 @@ class dataHandler():
         if serverConnection.is_connected(): return serverConnection
         else: return False
 
-
-    def requestLastRow(self):
+    def requestRow(self, timestamp):
         # open DB connection
         self.mySQLConnection = dataHandler.openMySQLConnection()
         # if connection fails, return
@@ -126,14 +125,14 @@ class dataHandler():
             # get cursor
             self.mySQLCursor = self.mySQLConnection.cursor()
 
-            SQLCommand = "SELECT time_local FROM pythonexporters.radiation_importFromBfS ORDER BY time_local DESC LIMIT 1"
+            SQLCommand = "SELECT * FROM pythonexporters.radiation_importFromBfS WHERE time_local='" + str(timestamp) + "'"
 
             self.mySQLCursor.execute(SQLCommand)
             lastRow = self.mySQLCursor.fetchall()
             return lastRow
         else: return False
 
-    def storeData(self, time_local, location1, location2, location3, location4, location5):
+    def insertData(self, time_local, location1, location2, location3, location4, location5):
 
         # if connection fails, return
         if self.testMySQLConnection: 
@@ -162,6 +161,35 @@ class dataHandler():
         else:
             logging.writeError("failed connecting to mySQL server, check config - exiting.")
 
+    def updateData(self, time_local, location1, location2, location3, location4, location5):
+
+        # if connection fails, return
+        if self.testMySQLConnection: 
+            
+            if location1 == 0.0: location1value = "NULL"
+            else: location1value = "'" + str(location1) + "'"
+
+            if location2 == 0.0: location2value = "NULL"
+            else: location2value = "'" + str(location2) + "'"
+
+            if location3 == 0.0: location3value = "NULL"
+            else: location3value = "'" + str(location3) + "'"
+
+            if location4 == 0.0: location4value = "NULL"
+            else: location4value = "'" + str(location4) + "'"
+
+            if location5 == 0.0: location5value = "NULL"
+            else: location5value = "'" + str(location5) + "'"
+
+            SQLCommand = "UPDATE `" + MYSQLTABLENAME + "` SET `time_local`='" + str(time_local) + "',`location1`=" + location1value + ",`location2`=" + location2value + ",`location3`=" + location3value + ",`location4`=" + location4value + ",`location5`=" + location5value + " WHERE time_local='" + str(time_local) + "'"
+
+            self.mySQLCursor.execute(SQLCommand)
+            self.mySQLConnection.commit()
+
+        else:
+            logging.writeError("failed connecting to mySQL server, check config - exiting.")
+    
+
     # select data from container, skip empty locations
     def requestDataFromContainer(self, location, timestamp):
         try: 
@@ -170,20 +198,8 @@ class dataHandler():
             value = 0.0
         return value
 
-
     def controller(self):        
-        lastData = dataHandler.requestLastRow(self)
-
-        # case: no data in SQL table
-        if not lastData:
-            yesterday = datetime.datetime.now() - datetime.timedelta(1)
-            lastTimestamp = yesterday.strftime('%Y-%m-%d %H:%M:%S')
-            logging.write("SQL Table empty, using yesterday: " + lastTimestamp)
-            formattedTimestamp = time.mktime(yesterday.timetuple())
-        else:
-            lastTimestamp = lastData[0][0]
-            logging.write("Last data in SQL Table is: " + str(lastTimestamp))
-            formattedTimestamp = time.mktime(lastTimestamp.timetuple())
+        newData = False
 
         # firstly request data
         for location in locations.keys():
@@ -191,22 +207,37 @@ class dataHandler():
             if locations[location]:
                 dataHandler.requestFromBfS(self, locations[location])
 
-        # check if timestamp in database is older than requested
+        # open DB connection
+        self.mySQLConnection = dataHandler.openMySQLConnection()
+        
+        # get cursor
+        self.mySQLCursor = self.mySQLConnection.cursor()
+
+        # firstly update existing data
+        logging.write("Checking existing data...")
+
         if dataContainer.keys():
-            newData = False
-
-            # open DB connection
-            self.mySQLConnection = dataHandler.openMySQLConnection()
-            
-            # get cursor
-            self.mySQLCursor = self.mySQLConnection.cursor()
-
-            lastUnstoredTimestamp = ""
             # keys are locations
             key = next(iter(dataContainer.keys()))
             for timestamp in dataContainer[key].keys():
-                selectedTimestamp = time.mktime(datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ").timetuple())
-                if selectedTimestamp > formattedTimestamp:
+                # first try to get timestamp from SQL
+                sqlTimestamp = timestamp.replace("T", " ").replace("Z", "")
+                rowFromSQL = dataHandler.requestRow(self, sqlTimestamp)
+
+                # if there's data to update/validate
+                if rowFromSQL: 
+                    timestampInSQLRaw = rowFromSQL[0][0]
+
+                    loction1value = dataHandler.requestDataFromContainer(self, "location1", timestamp)
+                    loction2value = dataHandler.requestDataFromContainer(self, "location2", timestamp)
+                    loction3value = dataHandler.requestDataFromContainer(self, "location3", timestamp)
+                    loction4value = dataHandler.requestDataFromContainer(self, "location4", timestamp)
+                    loction5value = dataHandler.requestDataFromContainer(self, "location5", timestamp)
+                    dataHandler.updateData(self, timestampInSQLRaw, loction1value, loction2value, loction3value, loction4value, loction5value)
+                    #logging.write("Updating " + str(timestampInSQLRaw) + "...")
+
+                # otherwise add data
+                else:
                     timestampForSQL = timestamp.replace("T", " ").replace("Z", " ")
                     loction1value = dataHandler.requestDataFromContainer(self, "location1", timestamp)
                     loction2value = dataHandler.requestDataFromContainer(self, "location2", timestamp)
@@ -214,15 +245,15 @@ class dataHandler():
                     loction4value = dataHandler.requestDataFromContainer(self, "location4", timestamp)
                     loction5value = dataHandler.requestDataFromContainer(self, "location5", timestamp)
                     logging.write("Found unstored data:" + " " + str(timestampForSQL) + " " + str(loction1value) + " " + str(loction2value) + " " + str(loction3value) + " " + str(loction4value) + " " + str(loction5value))
-                    dataHandler.storeData(self, timestampForSQL, loction1value, loction2value, loction3value, loction4value, loction5value)
+                    dataHandler.insertData(self, timestampForSQL, loction1value, loction2value, loction3value, loction4value, loction5value)
                     newData = True
+       
+        # and at the end close DB connection
+        self.mySQLCursor.close()
+        self.mySQLConnection.close()
+        if not newData: logging.write("Maybe updated recent data, but no new data available")
 
-            # finally close DB connection
-            self.mySQLCursor.close()
-            self.mySQLConnection.close()
-            if not newData: logging.write("No new data available")
-
-
+        
     def __init__(self):        
         logging.write("Started importFromBfS")
 
