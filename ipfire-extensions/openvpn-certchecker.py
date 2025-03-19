@@ -242,7 +242,7 @@ class mailHandler():
 
         if certsInUse:
             mailText += "------"
-            mailText += '''<b>Certs that were used in the last ''' + str(LASTUSED) + ''' days:</b><br>'''
+            mailText += '''<br><b>Certs that were used in the last ''' + str(LASTUSED) + ''' days:</b><br>'''
             mailText += '''
                         '''
             mailText += "<table><tr><th>Connection name:</th><th>Last used:</th></tr>"
