@@ -259,7 +259,7 @@ class mailHandler():
                         '''
             for cert in certsFailed: mailText += "- " + cert 
 
-        mailText += "------"
+        mailText += "------<br>"
         mailText += '''
                     '''
         mailText += "openvpn-certchecker Version: " + str(VERSION) + "<br>"
