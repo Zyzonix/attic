@@ -228,7 +228,7 @@ class mailHandler():
 
         if certsUnused:
             mailText += "------"
-            mailText += '''<br><b>Certs that weren't used for ''' + str(LASTUSED) + ''' days):</b><br>'''
+            mailText += '''<br><b>Certificates that weren't used for ''' + str(LASTUSED) + ''' days):</b><br>'''
             mailText += '''
                         '''
             mailText += "<table><tr><th>Connection name:</th><th>Last used:</th><th>Days since last use:</th><th>Date created:</th></tr>"
@@ -242,7 +242,7 @@ class mailHandler():
 
         if certsInUse:
             mailText += "------"
-            mailText += '''<br><b>Certs that were used in the last ''' + str(LASTUSED) + ''' days:</b><br>'''
+            mailText += '''<br><b>Certificates that were used in the last ''' + str(LASTUSED) + ''' days:</b><br>'''
             mailText += '''
                         '''
             mailText += "<table><tr><th>Connection name:</th><th>Last used:</th></tr>"
@@ -259,7 +259,7 @@ class mailHandler():
                         '''
             for cert in certsFailed: mailText += "- " + cert 
 
-        mailText += "------<br>"
+        mailText += "------"
         mailText += '''
                     '''
         mailText += "openvpn-certchecker Version: " + str(VERSION) + "<br>"

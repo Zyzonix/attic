@@ -223,14 +223,14 @@ class mailHandler():
 
         if certsExpiringSoon:
             mailText += "------"
-            mailText += "<br><b>Certs that will expire soon (fewer than " + str(VALIDITYDAYS) + " days):</b><br>"
+            mailText += "<br><b>Certificates that will expire soon (fewer than " + str(VALIDITYDAYS) + " days):</b><br>"
             mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th><th>Days left until expired:</th></tr>"
             for cert in certsExpiringSoon.keys(): mailText += "<tr><td>" + cert + "</td><td>" + certsExpiringSoon[cert][1] + "</td><td>" + certsExpiringSoon[cert][0] + "</td></tr>"
             mailText += "</table><br>"
 
         if certsExpired:
             mailText += "------"
-            mailText += "<br><b>Certs that already expired:</b><br>"
+            mailText += "<br><b>Certificates that already expired:</b><br>"
             mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th></tr>"
             for cert in certsExpired.keys(): mailText += "<tr><td>" + cert + "</td><td>" + certsExpired[cert] + "</td></tr>"
             mailText += "</table><br>"
