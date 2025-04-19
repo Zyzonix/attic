@@ -15,14 +15,14 @@ Download the script to ```/etc/fcron.weekly/```:
 cd /etc/fcron.weekly/
 ```
 ```
-wget https://raw.githubusercontent.com/Zyzonix/attic/main/ipfire-extensions/openvpn-notifier.py
+wget https://raw.githubusercontent.com/Zyzonix/attic/main/ipfire-extensions/<script>.py
 ```
 Make it executeable:
 ```
-chmod +x /etc/fcron.weekly/openvpn-notifier.py
+chmod +x /etc/fcron.weekly/<script>.py
 ```
 
-### Configuration
+### Configuration (must be extended in the future)
 There are two settings you can set:
   - Setting ```SHOWVALID``` in the head of the script from ```True``` to ```False``` will hide all valid certificates within the email.
   - ```VALIDITYDAYS``` defines the number of days left until expiring before sending a notification.
