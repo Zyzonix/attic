@@ -7,7 +7,7 @@
 #
 # date created  | 03-03-2024 09:11:51
 # 
-# file          | ipfire-extensions/openvpn-notifier.py
+# file          | ipfire-extensions/openvpn-unused-notifier.py
 # project       | attic
 # file version  | 2.0
 #

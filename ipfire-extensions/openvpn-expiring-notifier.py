@@ -7,7 +7,7 @@
 #
 # date created  | 19-03-2025 10:00:00
 # 
-# file          | ipfire-extensions/openvpn-certchecker.py
+# file          | ipfire-extensions/openvpn-expiring-notifier.py
 # project       | attic
 # file version  | 2.0
 #
