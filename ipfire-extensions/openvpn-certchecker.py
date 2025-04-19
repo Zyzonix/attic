@@ -9,7 +9,7 @@
 # 
 # file          | ipfire-extensions/openvpn-certchecker.py
 # project       | attic
-# file version  | 1.1
+# file version  | 2.0
 #
 import email.charset
 import email.utils
@@ -27,11 +27,12 @@ email.charset.add_charset("utf-8", email.charset.SHORTEST, email.charset.QP, "ut
 # days since last used
 LASTUSED=90
 
-# email receiver
-EMAILRECEIVER="<receiver-email-address>"
+# email receiver, if empty the preconfigured from IPFire's mail.conf will be used
+# scheme: user@example.com
+EMAILRECEIVER=""
 
 # static variables
-VERSION=1.0
+VERSION=2.0
 
 # path to database file (must end with /)
 PATH="/var/ipfire/ovpn/"

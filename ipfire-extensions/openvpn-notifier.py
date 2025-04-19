@@ -9,7 +9,7 @@
 # 
 # file          | ipfire-extensions/openvpn-notifier.py
 # project       | attic
-# file version  | 1.3
+# file version  | 2.0
 #
 import email.charset
 import email.utils
@@ -29,11 +29,12 @@ VALIDITYDAYS=14
 # show vaild certs in mail
 SHOWVALID=True
 
-# email receiver
-EMAILRECEIVER="<receiver-email-address>"
+# email receiver, if empty the preconfigured from IPFire's mail.conf will be used
+# scheme: user@example.com
+EMAILRECEIVER=""
 
 # static variables
-VERSION=1.3
+VERSION=2.0
 
 # path to certs (must end with /)
 PATH="/var/ipfire/ovpn/certs/"
