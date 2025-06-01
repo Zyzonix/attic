@@ -3,9 +3,9 @@
 # written by ZyzonixDev
 # published by ZyzonixDevelopments
 #
-# Copyright (c) 2025 ZyzonixDevelopments
+# Copyright (c) 2024 ZyzonixDevelopments
 #
-# date created  | 19-03-2025 10:00:00
+# date created  | 03-03-2024 09:11:51
 # 
 # file          | ipfire-extensions/openvpn-expiring-notifier.py
 # project       | attic
@@ -18,14 +18,16 @@ import platform
 import subprocess
 import traceback
 import os
-import sqlite3
 from datetime import datetime
 
 # Encode emails in UTF-8 by default
 email.charset.add_charset("utf-8", email.charset.SHORTEST, email.charset.QP, "utf-8")
 
-# days since last used
-LASTUSED=90
+# remaining days of validity until notification
+VALIDITYDAYS=14
+
+# show vaild certs in mail
+SHOWVALID=True
 
 # email receiver, if empty the preconfigured from IPFire's mail.conf will be used
 # scheme: user@example.com
@@ -34,20 +36,13 @@ EMAILRECEIVER=""
 # static variables
 VERSION=2.0
 
-# path to database file (must end with /)
-PATH="/var/ipfire/ovpn/"
-
-# path to certs
-CERTPATH=PATH + "certs/"
+# path to certs (must end with /)
+PATH="/var/ipfire/ovpn/certs/"
 
 # openssl path
 OPENSSLPATH="/usr/bin/openssl"
 # complete command for openssl
-OPENSSLCOMMAND=OPENSSLPATH + " pkcs12 -nodes -legacy -passin pass:"" -in "
-OPENSSLCOMMANDPT2=OPENSSLPATH + " x509 -noout -subject"
-
-# command to get cert creation date
-OPENSSLCREATECOMMAND = OPENSSLPATH + " x509 -startdate -noout -in "
+OPENSSLCOMMAND=OPENSSLPATH + " x509 -enddate -noout -in "
 
 # date path
 DATEPATH="/bin/date"
@@ -208,7 +203,7 @@ class mailHandler():
 
 
     # main mail builder
-    def buildMail(certsInUse, certsUnused, certsFailed):
+    def buildMail(certsValid, certsExpiringSoon, certsExpired, certsCheckFailed):
         
         mailText = '<font face="Courier New">'
         mailText += '''
@@ -225,50 +220,41 @@ class mailHandler():
         }
         </style>
         '''
-        mailText += hostinformationHandler.getFullHostname() + ''' OpenVPN-Server - Certificate information <br>'''
+        mailText += hostinformationHandler.getFullHostname() + " OpenVPN-Server - Certificate information <br>"
 
-        if certsUnused:
+        if certsExpiringSoon:
             mailText += "------"
-            mailText += '''<br><b>Certificates that weren't used for ''' + str(LASTUSED) + ''' days:</b><br>'''
-            mailText += '''
-                        '''
-            mailText += "<table><tr><th>Connection name:</th><th>Last used:</th><th>Days since last use:</th><th>Date created:</th></tr>"
-            mailText += '''
-                        '''
-            for cert in certsUnused.keys(): 
-                mailText += "<tr><td>" + cert + "</td><td>" + str(certsUnused[cert][0]) + "</td><td>" + str(certsUnused[cert][1]) + "</td><td>" + str(certsUnused[cert][2]) + "</td></tr>"
-                mailText += '''
-                            '''
-            mailText += '''</table><br>'''
+            mailText += "<br><b>Certificates that will expire soon (fewer than " + str(VALIDITYDAYS) + " days):</b><br>"
+            mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th><th>Days left until expired:</th></tr>"
+            for cert in certsExpiringSoon.keys(): mailText += "<tr><td>" + cert + "</td><td>" + certsExpiringSoon[cert][1] + "</td><td>" + certsExpiringSoon[cert][0] + "</td></tr>"
+            mailText += "</table><br>"
 
-        if certsInUse:
+        if certsExpired:
             mailText += "------"
-            mailText += '''<br><b>Certificates that were used in the last ''' + str(LASTUSED) + ''' days:</b><br>'''
-            mailText += '''
-                        '''
-            mailText += "<table><tr><th>Connection name:</th><th>Last used:</th></tr>"
-            for cert in certsInUse.keys(): 
-                mailText += "<tr><td>" + cert + "</td><td>" + certsInUse[cert] + "</td></tr>"
-                mailText += '''
-                            '''
-            mailText += '''</table><br>'''
+            mailText += "<br><b>Certificates that already expired:</b><br>"
+            mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th></tr>"
+            for cert in certsExpired.keys(): mailText += "<tr><td>" + cert + "</td><td>" + certsExpired[cert] + "</td></tr>"
+            mailText += "</table><br>"
 
-        if certsFailed:
+        if certsValid and SHOWVALID:
             mailText += "------"
-            mailText += '''Failed to check:<br>'''
-            mailText += '''
-                        '''
-            for cert in certsFailed: mailText += "- " + cert 
+            mailText += "<br>Valid certificates:<br>"
+            mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th><th>Days left until expired:</th></tr>"
+            for cert in certsValid.keys(): mailText += "<tr><td>" + cert + "</td><td>" + certsValid[cert][1] + "</td><td>" + certsValid[cert][0] + "</td></tr>"
+            mailText += "</table><br>"
+
+        if certsCheckFailed:
+            mailText += "------"
+            mailText += "<br>Failed to check:<br>"
+            for cert in certsCheckFailed: mailText += "- " + cert + "<br>"
 
         mailText += "------<br>"
-        mailText += '''
-                    '''
-        mailText += "openvpn-certchecker Version: " + str(VERSION) + "<br>"
+        mailText += "openvpn-notifier Version: " + str(VERSION) + "<br>"
         mailText += "Source code: https://github.com/Zyzonix/attic/tree/main/ipfire-extensions </font>"
         return mailText
 
 
-    def sendMail(certsInUse, certsUnused, certsFailed):
+    def sendMail(certsValid, certsExpiringSoon, certsExpired, certsCheckFailed):
         
         # first import mail config
         result = mailHandler.getConfiguration()
@@ -297,17 +283,17 @@ class mailHandler():
                 smtp.connect(mailHandler.MAILSERVER, mailHandler.MAILSERVERPORT)
             
             subject = ""
-            # get number of certs that are unused
-            if certsUnused: subject += str(len(certsUnused.keys())) + " "
+            # get number of certs that will expire soon
+            if certsExpiringSoon: subject += str(len(certsExpiringSoon.keys())) + " "
 
-            payload = mailHandler.buildMail(certsInUse, certsUnused, certsFailed)
+            payload = mailHandler.buildMail(certsValid, certsExpiringSoon, certsExpired, certsCheckFailed)
 
-            subject += "VPN-Certificate(s) are unused for " + str(LASTUSED) + " days on [" + hostinformationHandler.getFullHostname() + "]"
+            subject += "VPN-Certificate(s) will expire soon on [" + hostinformationHandler.getFullHostname() + "]"
             msgRoot = MIMEText(payload, "html")
             msgRoot['Subject'] = subject
             msgRoot['From'] = mailHandler.EMAILSENDER
             msgRoot['To'] = mailHandler.EMAILRECEIVER
-            msgRoot.add_header("Message-Id", email.utils.make_msgid("openvpn-certchecker", domain=mailHandler.EMAILDOMAIN))
+            msgRoot.add_header("Message-Id", email.utils.make_msgid("openvpn-notifier", domain=mailHandler.EMAILDOMAIN))
             msgRoot.add_header("Date", email.utils.formatdate())
 
             try:
@@ -321,50 +307,37 @@ class mailHandler():
             logging.write("Mailing disabled or not configured properly.")
 
 # main class
-class openvpncertchecker():
+class openvpnnotifier():
+
+    # static lists
+    certsValid = {}
+    certsExpiringSoon = {}
+    certsExpired = {}
+    certsCheckFailed = []
 
     # get all pem-files in directory
-    def getP12s(directory):
+    def getPEMs(directory):
         allFilesInDir = os.listdir(directory)
         logging.write("Checking directory: " + directory)
         pemFiles = []
         
         # check filetype
         for file in allFilesInDir:
-            if file.endswith(".p12"):
+            if file.endswith(".pem"):
                 pemFiles.append(file)
 
         logging.write("Found " + str(len(pemFiles)) + " certificates")
         return pemFiles
 
     # get date
-    def getCNFromCert(cert):
-        completeCommand = OPENSSLCOMMAND + CERTPATH + cert + " | " + OPENSSLCOMMANDPT2
-        outputSubjectEncoded = subprocess.run(completeCommand, shell=True, capture_output=True)
-        outputSubject = outputSubjectEncoded.stdout.decode()[:-1]
-        outputSubjectErr = outputSubjectEncoded.stderr.decode()[:-1]
-        if not outputSubjectErr:
-            try: 
-                subjectSplit = outputSubject.split("CN = ")
-                certName = subjectSplit[1]
-                return certName
-            except: 
-                try:
-                    subjectSplit = outputSubject.split("CN=")
-                    certName = subjectSplit[1]
-                    return certName 
-                except: return False
-        else: return False
-
-    # get cert creation date
-    def getCertCreateDate(cert):
-        outputDateEncoded = subprocess.run(OPENSSLCREATECOMMAND + cert, shell=True, capture_output=True)
+    def getDateFromCert(cert):
+        outputDateEncoded = subprocess.run(OPENSSLCOMMAND + PATH + cert, shell=True, capture_output=True)
         outputDate = outputDateEncoded.stdout.decode()[:-1]
         outputDateErr = outputDateEncoded.stderr.decode()[:-1]
         if not outputDateErr:
             try: 
-                # remove 'notBefore='
-                rawOutputDate = outputDate.replace("notBefore=", "")
+                # remove 'notAfter='
+                rawOutputDate = outputDate.replace("notAfter=", "")
                 
                 formattedDateEncoded = subprocess.run(DATECOMMAND + rawOutputDate + "'", shell=True, capture_output=True)
                 formattedDate = formattedDateEncoded.stdout.decode()[:-1]
@@ -373,100 +346,64 @@ class openvpncertchecker():
             except: return False
         else: return False
 
-    # open DB connection
-    # only in read-only mode
-    def openDBConnection():
-        try:
-            sqlCommand = "file:" + PATH + "clients.db" + "?mode=ro"
-            sqlConnection = sqlite3.connect(sqlCommand, uri=True)
-        except:
-            logging.writeError("Failed to connect to dabase...")
-            return False
-        return sqlConnection
+    # check validity of selected cert
+    def checkValidity(cert):
+        
+        logging.write("Checking " + cert)
+        date = openvpnnotifier.getDateFromCert(cert)
+
+        if date:
+
+            # get dates
+            expiringDateOfCert = datetime.strptime(date, "%Y-%m-%d %H:%M:%S") 
+            currentDate = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
+            remainingDays = (expiringDateOfCert - currentDate).days
+
+            # if cert will expire in fewer than VALIDITYDAYS or is already expired
+            if remainingDays < VALIDITYDAYS:
+                if remainingDays > 0:
+                    logging.write("Cert '" + cert + "' will expire in " + str(remainingDays) + " days (" + str(expiringDateOfCert) + ")")
+                    openvpnnotifier.certsExpiringSoon[cert.replace("cert.pem", "")] = [str(remainingDays), str(expiringDateOfCert)]
+                else:
+                    logging.write("Cert '" + cert + "' is already expired: " + str(expiringDateOfCert))
+                    openvpnnotifier.certsExpired[cert.replace("cert.pem", "")] = str(expiringDateOfCert)
+
+            else:
+                logging.write("Cert '" + cert + "' is still " + str(remainingDays) + " days valid")
+                openvpnnotifier.certsValid[cert.replace("cert.pem", "")] = [str(remainingDays), str(expiringDateOfCert)]
+
+        else: 
+            logging.writeError("Was not able to retrieve validity date of " + cert)
+            logging.writeError("Command output was: " + str(date))
+
 
     def main():
-
-        # format: p12-name : certName 
-        dataArray = {}
-
-        mailRequired = False
-
-        # array of certs that havn't been used for $LASTUSED days
-        certsUnused = {}
-        # array of certs that have been used within $LASTUSED days
-        certsInUse = {}
-        # list of failed certs
-        certsFailed = []
-
         if PATH:
-            p12s = openvpncertchecker.getP12s(CERTPATH)
-            print(p12s)
-            if p12s:
-                for p12 in p12s:
+            certs = openvpnnotifier.getPEMs(PATH)
+            print(certs)
+            if certs:
+                for cert in certs:
                     # skip serverkey cert
-                    if not ("server" in p12): 
-                        certName = openvpncertchecker.getCNFromCert(p12)
-                        if certName:
-                            dataArray[p12] = certName
-                        else:
-                            formattedP12 = p12.replace(".p12", "")
-                            certsFailed.append(formattedP12)
-                            logging.writeError("Failed to obtain CN from " + str(p12))
-
-                if dataArray:
-                    logging.write("Collected all names of available p12...")
-                    sqlConnection = openvpncertchecker.openDBConnection()
-                    sqlCursor = sqlConnection.cursor()
-
-                    currentDate = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
-                    if sqlConnection:
-                        for p12 in dataArray.keys():
-                            logging.write("Checking " + p12)
-                            certName = dataArray[p12]
-                            sqlCursor.execute("SELECT * FROM sessions WHERE common_name='" + certName + "' ORDER BY connected_at DESC LIMIT 1")
-                            try:
-                                lastLine = list(sqlCursor.fetchone())
-                            except:
-                                # if connection was never used
-                                logging.write("Connection " + certName + " was never used.")
-                                lastLine = [certName, "unused", "unused"]
-                            formattedP12 = p12.replace(".p12", "")
-                            certFullpath = CERTPATH + p12.replace(".p12", "cert.pem")
-                            # if connection is active
-                            if not lastLine[2]: 
-                                certsInUse[formattedP12] = str(lastLine[1])
-                            # if cert was never used 
-                            elif lastLine[1] == "unused":
-                                mailRequired = True
-                                creationDate = openvpncertchecker.getCertCreateDate(certFullpath)
-                                certsUnused[formattedP12] = ["Never used", "Never used", creationDate]
-                            else: 
-                                # get dates
-                                lastUsedDate = datetime.strptime(lastLine[2], "%Y-%m-%d %H:%M:%S") 
-                                dayDelta = (currentDate - lastUsedDate).days + 1
-                                if dayDelta > LASTUSED:
-                                    logging.write("Cert " + certName + "/" + p12 + " wasn't used for longer than " + str(LASTUSED) + " days (" + str(dayDelta) + " days unused)")
-                                    mailRequired = True
-                                    creationDate = openvpncertchecker.getCertCreateDate(certFullpath)
-                                    certsUnused[formattedP12] = [str(lastLine[2]), dayDelta, creationDate]
-                                else:
-                                    certsInUse[formattedP12] = str(lastLine[1])
+                    if not ("server" in cert): openvpnnotifier.checkValidity(cert)
                     
                 # if any cert will expire soon or is already expired send mal
-                if mailRequired:
-                    mailHandler.sendMail(certsInUse, certsUnused, certsFailed)
+                if openvpnnotifier.certsExpiringSoon or openvpnnotifier.certsExpired:
+                    mailHandler.sendMail(openvpnnotifier.certsValid, 
+                                         openvpnnotifier.certsExpiringSoon, 
+                                         openvpnnotifier.certsExpired, 
+                                         openvpnnotifier.certsCheckFailed)
                 else:
-                    logging.write("All certs where in use within the last " + str(LASTUSED) + "days - no notification required!")
+                    logging.write("All certs are longer valid than " + str(VALIDITYDAYS) + "days - no notification required!")
                 logging.write("Exiting...")
         else:
             logging.writeError("No path configured, check your config! Exiting...")
 
     # initialization function
     def __init__(self):
-        logging.write("Starting ipfire-extentions/openvpn-certchecker check")
+        logging.write("Starting ipfire-extentions/openvpn-notifier check")
         logging.write("Running on " + hostinformationHandler.getFullHostname())
-        openvpncertchecker.main()
+        openvpnnotifier.main()
 
 
 if __name__ == "__main__":
-    openvpncertchecker() 
+    openvpnnotifier() 
