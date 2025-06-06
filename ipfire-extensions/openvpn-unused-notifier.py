@@ -258,12 +258,12 @@ class mailHandler():
             mailText += '''Failed to check:<br>'''
             mailText += '''
                         '''
-            for cert in certsFailed: mailText += "- " + cert 
+            for cert in certsFailed: mailText += "- " + cert + "<br>"
 
         mailText += "------<br>"
         mailText += '''
                     '''
-        mailText += "openvpn-certchecker Version: " + str(VERSION) + "<br>"
+        mailText += "openvpn-unused-notifier version: " + str(VERSION) + "<br>"
         mailText += "Source code: https://github.com/Zyzonix/attic/tree/main/ipfire-extensions </font>"
         return mailText
 
@@ -285,7 +285,7 @@ class mailHandler():
             logging.write("Building mail...")
 
             if mailHandler.MAILUSER and mailHandler.MAILPASSWORD:
-                smtp = smtplib.SMTP(mailHandler.MAILSERVER)
+                smtp = smtplib.SMTP(mailHandler.MAILSERVER, mailHandler.MAILSERVERPORT)
                 smtp.connect(mailHandler.MAILSERVER, mailHandler.MAILSERVERPORT)
                 smtp.ehlo()
                 smtp.starttls()

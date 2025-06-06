@@ -225,31 +225,52 @@ class mailHandler():
         if certsExpiringSoon:
             mailText += "------"
             mailText += "<br><b>Certificates that will expire soon (fewer than " + str(VALIDITYDAYS) + " days):</b><br>"
+            mailText += '''
+                        '''
             mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th><th>Days left until expired:</th></tr>"
-            for cert in certsExpiringSoon.keys(): mailText += "<tr><td>" + cert + "</td><td>" + certsExpiringSoon[cert][1] + "</td><td>" + certsExpiringSoon[cert][0] + "</td></tr>"
+            mailText += '''
+                        '''
+            for cert in certsExpiringSoon.keys(): 
+                mailText += "<tr><td>" + cert + "</td><td>" + certsExpiringSoon[cert][1] + "</td><td>" + certsExpiringSoon[cert][0] + "</td></tr>"
+                mailText += '''
+                '''
             mailText += "</table><br>"
 
         if certsExpired:
             mailText += "------"
             mailText += "<br><b>Certificates that already expired:</b><br>"
+            mailText += '''
+                        '''
             mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th></tr>"
-            for cert in certsExpired.keys(): mailText += "<tr><td>" + cert + "</td><td>" + certsExpired[cert] + "</td></tr>"
+            for cert in certsExpired.keys(): 
+                mailText += "<tr><td>" + cert + "</td><td>" + certsExpired[cert] + "</td></tr>"
+                mailText += '''
+                            '''
             mailText += "</table><br>"
 
         if certsValid and SHOWVALID:
             mailText += "------"
             mailText += "<br>Valid certificates:<br>"
+            mailText += '''
+                        '''
             mailText += "<table><tr><th>Certificate Name:</th><th>Expiring Date:</th><th>Days left until expired:</th></tr>"
-            for cert in certsValid.keys(): mailText += "<tr><td>" + cert + "</td><td>" + certsValid[cert][1] + "</td><td>" + certsValid[cert][0] + "</td></tr>"
+            for cert in certsValid.keys(): 
+                mailText += "<tr><td>" + cert + "</td><td>" + certsValid[cert][1] + "</td><td>" + certsValid[cert][0] + "</td></tr>"
+                mailText += '''
+                            '''
             mailText += "</table><br>"
 
         if certsCheckFailed:
             mailText += "------"
-            mailText += "<br>Failed to check:<br>"
+            mailText += '''Failed to check:<br>'''
+            mailText += '''
+                        '''
             for cert in certsCheckFailed: mailText += "- " + cert + "<br>"
 
         mailText += "------<br>"
-        mailText += "openvpn-notifier Version: " + str(VERSION) + "<br>"
+        mailText += '''
+                    '''
+        mailText += "openvpn-expiring-notifier version: " + str(VERSION) + "<br>"
         mailText += "Source code: https://github.com/Zyzonix/attic/tree/main/ipfire-extensions </font>"
         return mailText
 
@@ -271,7 +292,7 @@ class mailHandler():
             logging.write("Building mail...")
 
             if mailHandler.MAILUSER and mailHandler.MAILPASSWORD:
-                smtp = smtplib.SMTP(mailHandler.MAILSERVER)
+                smtp = smtplib.SMTP(mailHandler.MAILSERVER, mailHandler.MAILSERVERPORT)
                 smtp.connect(mailHandler.MAILSERVER, mailHandler.MAILSERVERPORT)
                 smtp.ehlo()
                 smtp.starttls()
