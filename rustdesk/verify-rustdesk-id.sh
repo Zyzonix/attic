@@ -31,11 +31,12 @@ printf "\n\nSetting RustDesk contents..."
 homes=$(ls /home)
 
 for home in $homes; do
-    sed -i "s/enc_id.*/id = '$ID'/g" /home/$home/.config/rustdesk/RustDesk.toml
-    sed -i "/id =.*/a\enc_id = ''" /home/$home/.config/rustdesk/RustDesk.toml
+    rm /home/$homes/.config/RustDesk.toml
+    #sed -i "s/enc_id.*/id = '$ID'/g" /home/$home/.config/rustdesk/RustDesk.toml
+    #sed -i "/id =.*/a\enc_id = ''" /home/$home/.config/rustdesk/RustDesk.toml
 done
 
-sed -i "s/enc_id.*/id = 'ID'/g" /root/.config/rustdesk/RustDesk.toml
+sed -i "s/enc_id.*/id = '$ID'/g" /root/.config/rustdesk/RustDesk.toml
 sed -i "/id =.*/a\enc_id = ''" /root/.config/rustdesk/RustDesk.toml
 
 
