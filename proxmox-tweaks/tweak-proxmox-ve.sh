@@ -47,13 +47,18 @@ if grep -q "$SEARCH1" "$PROXMOXLIBJS"; then
     echo "ProxmoxVE seems to got an update"
     echo "tweak-proxmox-ve.sh found lines to remove. Removing..."
     # create backup of old js-file
-    cp $PROXMOXLIBJS $PROXMOXLIBJS.bak
+    cp $PROXMOXLIBJS $PROXMOXLIBJS.bak.$DATE
 
     # replace first line
     sed -i "s/$SEARCH1/$REPLACE1/g" $PROXMOXLIBJS
 
     # delete second line
     sed -i "/$SEARCH2/d" $PROXMOXLIBJS
+
+    echo ""
+    echo "Changed lines:"
+    echo ""
+    /usr/bin/git diff $PROXMOXLIBJS $PROXMOXLIBJS.bak.$DATE
 
     # restart proxmox proxy
     systemctl restart pveproxy.service

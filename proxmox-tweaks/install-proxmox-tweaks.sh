@@ -38,6 +38,9 @@ printf "%s " "Select OS: PVE/PBS:"
 read OS
 
 if [[ $OS == "PBS" || $OS == "pbs" ]]; then
+    echo "Installing git..."
+    /usr/bin/apt-get install git
+    
     echo "Creating directory" $PATH
     /usr/bin/mkdir -p "$PATH"
     cd $PATH
@@ -58,6 +61,9 @@ if [[ $OS == "PBS" || $OS == "pbs" ]]; then
     exit 0
 
 elif [[ $OS == "PVE" || $OS == "pve" ]]; then
+    echo "Installing git..."
+    /usr/bin/apt-get install git
+    
     echo "Creating directory" $PATH
     /usr/bin/mkdir -p "$PATH"
     cd $PATH
