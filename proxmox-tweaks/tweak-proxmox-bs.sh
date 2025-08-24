@@ -81,7 +81,7 @@ if grep -q "$KEY1" "$PROXMOXLIBJS"; then
         echo ""
         echo "Changed lines:"
         echo ""
-        /usr/bin/git diff $PROXMOXLIBJS $PROXMOXLIBJS.bak.$DATE
+        /usr/bin/git diff $PROXMOXLIBJS.bak.$DATE $PROXMOXLIBJS
     fi
 
     # restart proxmox proxy
