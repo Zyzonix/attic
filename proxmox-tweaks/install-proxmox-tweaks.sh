@@ -58,8 +58,10 @@ if [[ $OS == "PBS" || $OS == "pbs" ]]; then
     # make crontab executeable
     /usr/bin/chmod +x $CRONPATH
 
+    echo ""
     echo "Content of $PATH is now:"
-    /usr/bin/ls -la $PATH
+    /usr/bin/ls -l $PATH
+    echo ""
     
     echo "Cleaning up"
     /usr/bin/rm $DOWNDIR/install-proxmox-tweaks.sh
