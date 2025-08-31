@@ -44,6 +44,10 @@ if [[ $OS == "PBS" || $OS == "pbs" ]]; then
     echo "Creating directory" $PATH
     /usr/bin/mkdir -p "$PATH"
     cd $PATH
+
+    echo "Cleaning up directory in case of update"
+    /usr/bin/rm -v $PATH*
+    echo ""
     
     echo "Downloading script fom " $BSSCRIPTURL
     /usr/bin/wget $BSSCRIPTURL
@@ -67,6 +71,10 @@ elif [[ $OS == "PVE" || $OS == "pve" ]]; then
     echo "Creating directory" $PATH
     /usr/bin/mkdir -p "$PATH"
     cd $PATH
+
+    echo "Cleaning up directory in case of update"
+    /usr/bin/rm -v $PATH*
+    echo ""
     
     echo "Downloading script fom " $VESCRIPTURL
     /usr/bin/wget $VESCRIPTURL
