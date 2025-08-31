@@ -9,7 +9,7 @@
 # 
 # file          | tweak-proxmox-bs.sh
 # project       | proxmox-tweaks
-# file version  | 0.0.2
+# file version  | 0.0.3
 #
 # GitHub: https://github.com/Zyzonix/attic/proxmox-tweaks/tweak-proxmox-bs.sh
 #
@@ -23,7 +23,7 @@
 #
 
 
-# Installation:
+# Installation, just use the auto installer also in this directory... but if you want to do it manually:
 # $ mkdir /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/
 # $ wget https://raw.githubusercontent.com/Zyzonix/attic/main/proxmox-tweaks/tweak-proxmox-bs.sh
 # then install a crontab under /etc/cron.daily to be run once a day: 

@@ -9,7 +9,7 @@
 # 
 # file          | tweak-proxmox-ve.sh
 # project       | proxmox-tweaks
-# file version  | 0.0.2
+# file version  | 0.0.3
 #
 # GitHub: https://github.com/Zyzonix/attic/proxmox-tweaks/tweak-proxmox-ve.sh
 #
@@ -19,10 +19,10 @@
 #############################################################
 #
 # tested against Proxmox VE 
-# - 7.4-16
+# - 8.4.12
 #
 
-# Installation:
+# Installation, just use the auto installer also in this directory... but if you want to do it manually:
 # $ mkdir /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/
 # $ wget https://raw.githubusercontent.com/Zyzonix/attic/main/proxmox-tweaks/tweak-proxmox-ve.sh
 # then install a crontab under /etc/cron.daily to be run once a day: 
@@ -30,38 +30,76 @@
 # /bin/bash /usr/share/javascript/proxmox-widget-toolkit/proxmox-tweaks/tweak-proxmox-ve.sh
 #
 
-
 PROXMOXLIBJS=/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+PROXMOXWIDGETPATH=/usr/share/javascript/proxmox-widget-toolkit/
 
-# keystring1 (old config) -> delete line
-SEARCH1='if (res === null || res === undefined || !res || res'
+KEY1='res === null ||'
+KEY2='res === undefined ||'
+KEY3='!res ||'
+KEY4="res.data.status.toLowerCase() !== 'active'"
 
-# keystring2 (old config)
-SEARCH2=".data.status.toLowerCase() !== 'active') {"
-# new keystring2
-REPLACE1="if (false) {"
+DATE=$(date '+%Y-%m-%d')
 
 # check if file was updated (true if contains SEARCH1)
-if grep -q "$SEARCH1" "$PROXMOXLIBJS"; then
+if grep -q "$KEY1" "$PROXMOXLIBJS"; then
 
-    echo "ProxmoxVE seems to got an update"
-    echo "tweak-proxmox-ve.sh found lines to remove. Removing..."
-    # create backup of old js-file
-    cp $PROXMOXLIBJS $PROXMOXLIBJS.bak.$DATE
+    # get row number of line and format to raw number
+    FIRSTLINE=$(grep -i -n "res === null ||" $PROXMOXLIBJS)
+    readarray -d ":" -t FIRSTLINENUMBER <<< "$FIRSTLINE"
+    LINE2NUMBER="$(($FIRSTLINENUMBER+1))"
+    LINE3NUMBER="$(($FIRSTLINENUMBER+2))"
+    LINE4NUMBER="$(($FIRSTLINENUMBER+3))"
 
-    # replace first line
-    sed -i "s/$SEARCH1/$REPLACE1/g" $PROXMOXLIBJS
+    # get all other lines
+    LINE1=$(sed -n ${FIRSTLINENUMBER}p $PROXMOXLIBJS)
+    LINE2=$(sed -n ${LINE2NUMBER}p $PROXMOXLIBJS)
+    LINE3=$(sed -n ${LINE3NUMBER}p $PROXMOXLIBJS)
+    LINE4=$(sed -n ${LINE4NUMBER}p $PROXMOXLIBJS)
 
-    # delete second line
-    sed -i "/$SEARCH2/d" $PROXMOXLIBJS
+    if [[ "$LINE1" == *"$KEY1"* ]] && [[ "$LINE2" == *"$KEY2"* ]] && [[ "$LINE3" == *"$KEY3"* ]] && [[ "$LINE4" == *"$KEY4"* ]]; then
+        echo "ProxmoxVE seems to got an update"
+        echo "tweak-proxmox-ve.sh found lines to remove. Removing..."
+    
+        # create backup of old js-file
+        cp $PROXMOXLIBJS $PROXMOXLIBJS.bak.$DATE
 
-    echo ""
-    echo "Changed lines:"
-    echo ""
-    /usr/bin/git diff $PROXMOXLIBJS $PROXMOXLIBJS.bak.$DATE
+        # start remove from end to prevent line number change while removing
+        sed -i ${LINE4NUMBER}d $PROXMOXLIBJS
+        sed -i ${LINE3NUMBER}d $PROXMOXLIBJS
+        sed -i ${LINE2NUMBER}d $PROXMOXLIBJS
+        sed -i ${FIRSTLINENUMBER}d $PROXMOXLIBJS
+        
+        echo "Removed old lines..."
+        IFLINENUMBER="$(($FIRSTLINENUMBER-1))"
+        IFLINECONTENT=$(sed -n ${IFLINENUMBER}p $PROXMOXLIBJS)
+        NEWIFLINECONTENT="$IFLINECONTENT false"
+
+        sed -i "${IFLINENUMBER}s/.*/${NEWIFLINECONTENT}/" $PROXMOXLIBJS
+
+        echo "Updated remaining lines."
+
+        echo ""
+        echo "Changed lines:"
+        echo ""
+        /usr/bin/git diff $PROXMOXLIBJS.bak.$DATE $PROXMOXLIBJS
+
+        echo ""
+
+        NUMBEROFBACKUPS=$(/usr/bin/find $PROXMOXWIDGETPATH -name "*.bak.*" | wc -l)
+        if (( $NUMBEROFBACKUPS > 1 )); then
+            echo "Cleaning up old backups..."
+            echo "Found $NUMBEROFBACKUPS backup files"
+            echo "Deleting backups older than 120 days..."
+            /usr/bin/find $PROXMOXWIDGETPATH -name "*.bak.*" -mtime +120 -print -delete
+            echo ""
+            echo "Finished backup cleanup"
+        fi
+        
+    fi
 
     # restart proxmox proxy
     systemctl restart pveproxy.service
     
+    echo ""
     echo "Restarted proxy"
 fi

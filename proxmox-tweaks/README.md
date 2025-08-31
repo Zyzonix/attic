@@ -12,12 +12,6 @@ Run the install script:
 $ bash install-proxmox-tweaks.sh
 ```
 
-You will be asked for PVE/PBS, just enter it.
-Finally remove the installer:
-```
-$ rm install-proxmox-tweaks.sh
-```
-
-Usually there is no update required.
+Usually there is no update required, but if so, just re un the commands above. The script will cleanup itself and also older versions.
 
 For any related updates checkout our public Wiki under [FIXES@Brecht](https://fixes.brecht-schule.hamburg/).
