@@ -32,6 +32,7 @@
 
 
 PROXMOXLIBJS=/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+PROXMOXWIDGETPATH=/usr/share/javascript/proxmox-widget-toolkit/
 
 KEY1='res === null ||'
 KEY2='res === undefined ||'
@@ -82,6 +83,19 @@ if grep -q "$KEY1" "$PROXMOXLIBJS"; then
         echo "Changed lines:"
         echo ""
         /usr/bin/git diff $PROXMOXLIBJS.bak.$DATE $PROXMOXLIBJS
+
+        echo ""
+
+        NUMBEROFBACKUPS=$(/usr/bin/find $PROXMOXWIDGETPATH -name "*.bak.*" | wc -l)
+        if (( $NUMBEROFBACKUPS > 1 )); then
+            echo "Cleaning up old backups..."
+            echo "Found $NUMBEROFBACKUPS backup files"
+            echo "Deleting backups older than 120 days..."
+            /usr/bin/find $PROXMOXWIDGETPATH -name "*.bak.*" -mtime +120 -print -delete
+            echo ""
+            echo "Finished backup cleanup"
+        fi
+        
     fi
 
     # restart proxmox proxy
