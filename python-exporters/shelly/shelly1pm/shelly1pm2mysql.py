@@ -7,9 +7,9 @@
 #
 # date created  | 26-02-2024 06:50:16
 # 
-# file          | python-exporters/shelly.py
+# file          | python-exporters/shelly1pm2mysql.py
 # project       | python-exporters
-# file version  | 1.1
+# file version  | 1.2
 #
 from datetime import datetime, timezone
 import requests
@@ -153,9 +153,9 @@ class dataHandler():
         
 
     def __init__(self):
-        logging.LOGFILE = "shelly2mysql_" + str(datetime.now().strftime("%Y-%m-%d")) + ".log"
+        logging.LOGFILE = "shelly1pm2mysql_" + str(datetime.now().strftime("%Y-%m-%d")) + ".log"
         
-        logging.write("Started shelly2mysql")
+        logging.write("Started shelly1pm2mysql")
 
         # open mySQL connection
         self.mySQLConnection = dataHandler.openMySQLConnection()

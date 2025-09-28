@@ -7,8 +7,8 @@ Name | Type of use
 ---|---
 [Watchdog - Prometheus](#exporter-for-watchdog-for-prometheus) | Monitor connection to any server with ping and save data to Prometheus
 [Watchdog - MySQL](#exporter-for-watchdog-for-mysql) | Monitor connection to any server with ping and save data to MySQL
-[Shelly - Prometheus](#exporter-for-shellypm-plug-for-prometheus) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to Prometheus
-[Shelly - MySQL](#exporter-for-shellypm-plug-for-mysql) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to MySQL
+[Shelly - Prometheus](#exporter-for-shellypm-plug-for-prometheus) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to Prometheus (Only Shelly devices Gen 1 supported!)
+[Shelly - MySQL](#exporter-for-shellypm-plug-for-mysql) | Monitor ShellyPM, power usage ans Shelly system statistics and save data to MySQL. **There are two scripts, the first for older Shelly devices (1. Gen) and a second for newer ones (Gen 2 and Gen3)!**
 [Weatherstation - Prometheus](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation)
 [Weatherstation - MySQL](#exporter-for-rpi-weatherstation) | Monitor [rpi-weatherstation](https://github.com/Zyzonix/rpi-weatherstation) and save data to MySQL
 [Radiation - MySQL](#exporter-for-geiger-counter-sen0463-for-mysql) | Monitor DFRobot Geiger Counter SEN0463 and save data to MySQL
@@ -78,6 +78,8 @@ journalctl -r -u watchdog-mysql-exporter.service
 
 ## Exporter for ShellyPM Plug for Prometheus
 
+**Only Shelly devices from Gen1 are supported for Prometheus export!**
+
 ### Installation
 
 The installation process is quite easy:
@@ -110,7 +112,7 @@ journalctl -r -u shelly-prometheus-exporter.service
 
 ## Exporter for ShellyPM Plug for MySQL
 
-### Installation
+### Installation for Shelly Gen1 devices:
 
 The installation process is quite easy:
 
@@ -118,13 +120,41 @@ The installation process is quite easy:
 ```
 mkdir -p /root/python-exporters/
 ```
- - Download ```shelly2mysql.py``` and ```shelly-mysql-exporter.service``` 
+ - Download ```shelly1pm2mysql.py``` and ```shelly-mysql-exporter.service``` from ```shelly1pm/```
  - Move the service file to the correct directory
 ```
 mv /root/python-exporters/shelly-mysql-exporter.service /etc/systemd/system
 ```
  - Install the ```python3-mysql-connector``` package from ```/packages/```  
- - Edit ```shelly2mysql.py```: Set ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
+ - Edit ```shelly1pm2mysql.py```: Set ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
+ - Configure the MySQL server and paste the required data to the static variables in the header section of this script. Required are ```MYSQLHOST```, ```MYSQLDATABASENAME```, ```MYSQLTABLENAME```, ```MYSQLUSER``` and ```MYSQLPW```.
+ - Enable and start the service
+```
+systemctl enable shelly-mysql-exporter.service
+```
+```
+systemctl start shelly-mysql-exporter.service
+```  
+ - Check the current output with
+```
+journalctl -r -u shelly-exporter.service
+```
+
+### Installation for Shelly Gen2/Gen3 devices:
+
+The installation process is quite easy:
+
+ - Create directories:
+```
+mkdir -p /root/python-exporters/
+```
+ - Download ```shellypmgen32mysql.py``` and ```shelly-mysql-exporter.service``` from ```shellypmgen3/```
+ - Move the service file to the correct directory
+```
+mv /root/python-exporters/shelly-mysql-exporter.service /etc/systemd/system
+```
+ - Install the ```python3-mysql-connector``` package from ```/packages/```  
+ - Edit ```shellypmgen32mysql.py```: Set ```SHELLYURL``` to the URL of the ShellyPlug that should be monitored.
  - Configure the MySQL server and paste the required data to the static variables in the header section of this script. Required are ```MYSQLHOST```, ```MYSQLDATABASENAME```, ```MYSQLTABLENAME```, ```MYSQLUSER``` and ```MYSQLPW```.
  - Enable and start the service
 ```

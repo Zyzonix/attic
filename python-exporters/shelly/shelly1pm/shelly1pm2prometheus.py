@@ -7,7 +7,7 @@
 #
 # date created  | 26-02-2024 06:50:16
 # 
-# file          | python-exporters/shelly.py
+# file          | python-exporters/shelly1pm2prometheus.py
 # project       | python-exporters
 # file version  | 1.0
 #
