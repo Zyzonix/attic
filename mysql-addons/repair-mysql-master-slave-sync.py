@@ -51,8 +51,6 @@ email.charset.add_charset("utf-8", email.charset.SHORTEST, email.charset.QP, "ut
 # hostaname command
 HOSTNAMECOMMAND="/bin/hostname --long"
 
-SEND_MAIL=False
-
 # time for logging / console out
 class ctime():
     def getTime():
@@ -150,7 +148,7 @@ class mailHandler():
         mailText += "------<br>"
         mailText += '''
                     '''
-        mailText += "Source code: https://github.com/Zyzonix/attic/tree/main/mysql </font>"
+        mailText += "Source code: https://github.com/Zyzonix/attic/tree/main/mysql-addons </font>"
         return mailText
 
 
@@ -286,12 +284,13 @@ class autorepairmysql():
 
 
     def run(self):
+        SEND_MAIL = False
         for STATION in STATIONS.keys():
             logging.write("Selected '" + STATION + "'")
             outofsync = autorepairmysql.checkSyncState(STATION)
             if outofsync: 
                 pingable = autorepairmysql.checkPing(STATIONS[STATION]["MASTER_HOST"])
-                SEND_MAIL=True
+                SEND_MAIL = True
                 if pingable: 
                     logging.write("Trying to get master status...")
                     MASTER_LOG_FILE = autorepairmysql.getMasterLogFilePos(STATIONS[STATION]["MASTER_HOST"], STATIONS[STATION]["SSH_PORT"], STATIONS[STATION]["SSH_USER"])
