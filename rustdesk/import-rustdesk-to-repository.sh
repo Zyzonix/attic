@@ -36,14 +36,19 @@ ARM64_PRE_NAME="rustdesk-"$1"-aarch64.deb"
 AMD64_FINAL_NAME="rustdesk_"$1"_amd64.deb"
 ARM64_FINAL_NAME="rustdesk_"$1"_arm64.deb"
 
-echo "Downloading version:" $1 $TARGETPATH$AMD64_PATH$AMD64_FINAL_NAME
+if test -z "$1"; then
+    echo "No version found. Returning..."
+    exit 1
+fi
+
+echo "Downloading version:" $1 
 echo ""
 read -p "Press any key to continue the download or CTRL+C to exit..." CONFIRM
 echo ""
 
 echo "Trying to download:" $AMD64_PRE_NAME
 /usr/bin/curl -L $URL$1/$AMD64_PRE_NAME -o $TARGETPATH$AMD64_PATH$AMD64_FINAL_NAME
-echo "Downloaded to:" $TARGETPATH$ARM64_PATH
+echo "Downloaded to:" $TARGETPATH$AMD64_PATH
 echo "Named downloaded file:" $AMD64_FINAL_NAME
 echo ""
 
