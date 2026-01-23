@@ -152,7 +152,9 @@ class dataHandler():
             endTime = time.time()
             timedelta = endTime-startTime
             logging.write("timedelta: " + str(timedelta))
-            time.sleep(RERUNINTERVAL - timedelta)
+            timeToSleep = RERUNINTERVAL - timedelta
+            if timeToSleep < 0: timeToSleep = 0
+            time.sleep(timeToSleep)
         
 
     def __init__(self):
