@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+#
+# written by Zyzonix
+# published by xerberosDevelopments
+#
+# Copyright (c) 2026 xerberosDevelopments
+#
+# date created  | 10-03-2026 11:13:48
+# 
+# file          | python-exporters/shelly/recover-shelly
+# project       | attic
+#
+
+
+given=$(mariadb -u root -e "SELECT time_local FROM pythonexporters.shellydata ORDER BY time_local DESC LIMIT 1;" --disable-column-names -B)
+
+# Convert both times to seconds since epoch
+given_epoch=$(date -d "$given" +%s 2>/dev/null) || exit 1
+now_epoch=$(date +%s)
+
+# Difference in seconds
+(( age = now_epoch - given_epoch ))
+
+if (( age > 120 )); then
+    echo "Service not sending data..."
+    systemctl restart shelly-mysql-exporter.service
+    echo "Restarted service"
+    touch /tmp/recovered-shelly
+fi
+
+exit 0
