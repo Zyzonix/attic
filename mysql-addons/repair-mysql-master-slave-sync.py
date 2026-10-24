@@ -203,7 +203,7 @@ class autorepairmysql():
             resultErr = resultEncoded.stderr.decode()[:-1]
             if resultErr: logging.writeError("Failed to run sync state command,  error returned")
             splitResult2 = result.split(":")[1]
-            if "No" in splitResult2: 
+            if not "Yes" in splitResult2: 
                 outofsync = True
                 logging.write("'" + MASTER_NAME + "' is currently not syncing")
         except:
@@ -216,6 +216,9 @@ class autorepairmysql():
     def checkPing(IP):
         try:
             responseInS = ping(IP, timeout=10)
+            if responseInS is None:
+                logging.writeError("Not pingable (" + IP + ")")
+                return False
             responseInMs = round(responseInS*1000, 2)
             logging.write("Connecting to " + IP + " took " + str(responseInMs) + "ms")
         except:
@@ -290,8 +293,8 @@ class autorepairmysql():
             outofsync = autorepairmysql.checkSyncState(STATION)
             if outofsync: 
                 pingable = autorepairmysql.checkPing(STATIONS[STATION]["MASTER_HOST"])
-                SEND_MAIL = True
                 if pingable: 
+                    SEND_MAIL = True
                     logging.write("Trying to get master status...")
                     MASTER_LOG_FILE = autorepairmysql.getMasterLogFilePos(STATIONS[STATION]["MASTER_HOST"], STATIONS[STATION]["SSH_PORT"], STATIONS[STATION]["SSH_USER"])
                     if MASTER_LOG_FILE: 
